@@ -3,25 +3,43 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bearly Believable — Local Guide</title>
+<title>Bertha — Bearly Believable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #faf7f2; --card-bg: #ffffff; --text: #2b2622; --text-dim: #6b6259;
-    --accent: #2f6f4f; --accent-dim: #dcece2; --border: #e7e0d6;
+    --bg: #f4f1ec; --card-bg: #ffffff; --text: #201d18; --text-dim: #6b6259;
+    --accent: #2f6f4f; --accent2: #1f9d6f; --accent-dim: #dcece2; --border: #e7e0d6;
     --warn: #a15b12; --warn-bg: #fbeedd; --danger: #a13a2f;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 3rem; }
-  header { padding: 1.5rem 1rem 1.25rem; background: var(--accent); color: white; text-align: center; }
-  header .persona { font-size: 2rem; margin-bottom: 0.2rem; }
-  header h1 { margin: 0 0 0.3rem; font-size: 1.4rem; }
-  header p { margin: 0; font-size: 0.88rem; opacity: 0.92; }
-  main { max-width: 640px; margin: 0 auto; padding: 0 0.75rem; }
-  .welcome {
-    margin: 1rem 0; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 12px; font-size: 0.9rem; line-height: 1.5;
+  body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 3rem; }
+
+  .topnav { position: sticky; top: 0; z-index: 20; background: rgba(244,241,236,0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 0.85rem 1.1rem; display: flex; align-items: center; justify-content: space-between; }
+  .topnav a.back { text-decoration: none; color: var(--text-dim); font-size: 0.86rem; font-weight: 500; display: flex; align-items: center; gap: 0.3rem; }
+  .topnav a.back:hover { color: var(--accent); }
+  .topnav .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); box-shadow: 0 0 0 3px rgba(31,157,111,0.18); display: inline-block; margin-right: 0.4rem; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  header {
+    padding: 2.6rem 1rem 4.5rem; text-align: center; color: white; position: relative; overflow: hidden;
+    background: radial-gradient(circle at 20% -10%, #3a8a63 0%, transparent 55%), linear-gradient(160deg, #163c29 0%, #1f5a3d 45%, #2f6f4f 100%);
   }
-  .search-bar { position: sticky; top: 0; background: var(--bg); padding: 0.75rem 0; z-index: 10; }
+  header .persona {
+    font-size: 3.2rem; margin-bottom: 0.5rem; display: inline-flex; align-items: center; justify-content: center;
+    width: 5.2rem; height: 5.2rem; border-radius: 50%; background: rgba(255,255,255,0.12);
+    box-shadow: 0 0 0 6px rgba(255,255,255,0.06), 0 20px 40px -12px rgba(0,0,0,0.5);
+  }
+  header h1 { margin: 0 0 0.35rem; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.01em; }
+  header p { margin: 0; font-size: 0.92rem; opacity: 0.85; font-weight: 500; }
+
+  main { max-width: 640px; margin: -3rem auto 0; padding: 0 0.9rem; position: relative; z-index: 5; }
+  .welcome {
+    margin: 1rem 0; padding: 1.1rem 1.25rem; background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 16px; font-size: 0.9rem; line-height: 1.55; box-shadow: 0 18px 40px -22px rgba(30,30,20,0.25);
+  }
+  .search-bar { position: sticky; top: 3.6rem; background: var(--bg); padding: 0.75rem 0; z-index: 10; }
   .search-bar input {
     width: 100%; padding: 0.7rem 0.9rem; font-size: 0.95rem; border: 1px solid var(--border);
     border-radius: 10px; background: white;
@@ -55,40 +73,62 @@
   }
   footer { text-align: center; font-size: 0.72rem; color: var(--text-dim); padding: 1.5rem 1rem; }
 
-  .bertha-box { margin: 1rem 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-  .bertha-head { padding: 0.9rem 1rem; background: var(--accent); color: white; display: flex; align-items: center; gap: 0.6rem; }
-  .bertha-head .avatar { font-size: 1.6rem; }
-  .bertha-head h2 { margin: 0; font-size: 1.05rem; }
-  .bertha-disclosure { font-size: 0.72rem; padding: 0.5rem 1rem; background: var(--accent-dim); color: var(--text-dim); border-bottom: 1px solid var(--border); }
-  .bertha-gate { padding: 1rem; font-size: 0.85rem; line-height: 1.5; }
+  .bertha-box {
+    margin: 1rem 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    box-shadow: 0 24px 60px -28px rgba(20,20,15,0.3);
+  }
+  .bertha-head { padding: 1rem 1.15rem; background: linear-gradient(120deg, #1f5a3d, #2f6f4f 60%, #1f9d6f); color: white; display: flex; align-items: center; gap: 0.65rem; }
+  .bertha-head .avatar { font-size: 1.4rem; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; }
+  .bertha-head h2 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+  .bertha-head .status { font-size: 0.72rem; opacity: 0.85; display: flex; align-items: center; gap: 0.3rem; margin-top: 0.1rem; }
+  .bertha-head .status .dot { width: 6px; height: 6px; border-radius: 50%; background: #6de3a8; box-shadow: 0 0 0 3px rgba(109,227,168,0.25); }
+  .bertha-disclosure { font-size: 0.72rem; padding: 0.55rem 1.15rem; background: var(--accent-dim); color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .bertha-gate { padding: 1.1rem 1.15rem; font-size: 0.85rem; line-height: 1.55; }
   .bertha-gate button {
-    margin-top: 0.7rem; padding: 0.6rem 1.1rem; border-radius: 8px; border: none;
-    background: var(--accent); color: white; font-size: 0.88rem; cursor: pointer;
+    margin-top: 0.8rem; padding: 0.65rem 1.2rem; border-radius: 999px; border: none;
+    background: linear-gradient(120deg, var(--accent), var(--accent2)); color: white; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    box-shadow: 0 10px 24px -10px rgba(47,111,79,0.6); transition: transform 0.15s ease;
   }
-  .bertha-log { padding: 0.75rem 1rem; max-height: 50vh; overflow-y: auto; display: none; }
-  .bertha-msg { margin: 0.5rem 0; font-size: 0.88rem; line-height: 1.45; }
+  .bertha-gate button:hover { transform: translateY(-1px); }
+  .bertha-log { padding: 0.9rem 1.1rem; max-height: 52vh; overflow-y: auto; display: none; scroll-behavior: smooth; }
+  .bertha-msg { margin: 0.6rem 0; font-size: 0.9rem; line-height: 1.5; animation: msg-in 0.25s ease; }
+  @keyframes msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .bertha-msg.user { text-align: right; }
-  .bertha-msg .bubble { display: inline-block; max-width: 85%; padding: 0.55rem 0.8rem; border-radius: 12px; }
-  .bertha-msg.user .bubble { background: var(--accent); color: white; }
-  .bertha-msg.bear .bubble { background: var(--accent-dim); color: var(--text); }
-  .bertha-msg .cat { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.2rem; }
-  .bertha-input-row { display: none; padding: 0.75rem 1rem 1rem; gap: 0.4rem; }
+  .bertha-msg .bubble { display: inline-block; max-width: 85%; padding: 0.6rem 0.9rem; border-radius: 16px; }
+  .bertha-msg.user .bubble { background: linear-gradient(120deg, var(--accent), var(--accent2)); color: white; border-bottom-right-radius: 4px; }
+  .bertha-msg.bear .bubble { background: #f0ede6; color: var(--text); border-bottom-left-radius: 4px; }
+  .bertha-msg .cat { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.25rem; }
+  .typing-dots { display: inline-flex; gap: 0.28rem; padding: 0.7rem 1rem; background: #f0ede6; border-radius: 16px; border-bottom-left-radius: 4px; }
+  .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #9a9285; animation: bounce 1.2s infinite ease-in-out; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity: 0.6; } 30% { transform: translateY(-4px); opacity: 1; } }
+  .bertha-input-row { display: none; padding: 0.85rem 1.1rem 1.1rem; gap: 0.5rem; }
   .bertha-input-row input {
-    flex: 1; padding: 0.6rem 0.8rem; font-size: 0.9rem; border: 1px solid var(--border); border-radius: 8px;
+    flex: 1; padding: 0.75rem 1rem; font-size: 0.92rem; border: 1px solid var(--border); border-radius: 999px;
+    background: #f7f5f0; transition: border-color 0.15s ease, background 0.15s ease;
   }
+  .bertha-input-row input:focus { outline: none; border-color: var(--accent2); background: white; }
   .bertha-input-row button {
-    padding: 0.6rem 1rem; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer;
+    padding: 0.75rem 1.3rem; border-radius: 999px; border: none; background: linear-gradient(120deg, var(--accent), var(--accent2));
+    color: white; cursor: pointer; font-weight: 600; box-shadow: 0 10px 24px -10px rgba(47,111,79,0.6); transition: transform 0.15s ease;
   }
-  .bertha-fallback-note { padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--warn); background: var(--warn-bg); display: none; }
-  .fallback-toggle { text-align: center; margin: 1.25rem 0 0.5rem; font-size: 0.82rem; color: var(--accent); }
+  .bertha-input-row button:hover { transform: translateY(-1px); }
+  .bertha-fallback-note { padding: 0.75rem 1.1rem; font-size: 0.8rem; color: var(--warn); background: var(--warn-bg); display: none; }
+  .fallback-toggle { text-align: center; margin: 1.25rem 0 0.5rem; font-size: 0.82rem; color: var(--accent); cursor: pointer; }
 </style>
 </head>
 <body>
 
+<div class="topnav">
+  <a class="back" href="index.html">← Bearly Believable</a>
+  <span style="font-size:0.78rem;color:var(--text-dim);"><span class="live-dot"></span>Bertha is live</span>
+</div>
+
 <header>
   <div class="persona">🐻</div>
-  <h1>Hi, I'm Bearly-Betha!</h1>
-  <p>Your local guide for the stay at Bearly Believable — 160 Leo Friend Road</p>
+  <h1>Hi, I'm Bertha!</h1>
+  <p>Your local guide for the stay at Bearly Believable</p>
 </header>
 
 <main>
@@ -97,7 +137,10 @@
   </div>
 
   <div class="bertha-box">
-    <div class="bertha-head"><span class="avatar">🐻</span><h2>Talk to Bertha</h2></div>
+    <div class="bertha-head">
+      <span class="avatar">🐻</span>
+      <div><h2>Talk to Bertha</h2><div class="status"><span class="dot"></span>AI-assisted local guide</div></div>
+    </div>
     <div class="bertha-disclosure">Bertha's replies are AI-drafted, not reviewed by a person before you see them. She only knows what's in this local guide — for anything time-sensitive or safety-related, verify with the business directly or ask your host.</div>
     <div class="bertha-gate" id="bertha-gate">
       <strong>Before you chat with Bertha:</strong> she's an AI-assisted guide and can make mistakes — verify anything important with the business itself. To help improve her, the text of your questions and her answers is logged for up to 60 days, then deleted; no name, phone, email, or reservation info is collected or stored. Rick is the accountable owner of this data — reach him directly with any concern.
@@ -789,12 +832,27 @@ async function berthaAccept() {
   }
 }
 
+function berthaShowTyping() {
+  const log = document.getElementById('bertha-log');
+  const div = document.createElement('div');
+  div.className = 'bertha-msg bear';
+  div.id = 'bertha-typing';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+function berthaHideTyping() {
+  const el = document.getElementById('bertha-typing');
+  if (el) el.remove();
+}
+
 async function berthaSend() {
   const input = document.getElementById('bertha-input');
   const message = input.value.trim();
   if (!message) return;
   input.value = '';
   berthaAppendMsg('user', message);
+  berthaShowTyping();
   const sid = berthaSessionId();
   try {
     const res = await fetch(BERTHA_API + '/chat', {
@@ -802,6 +860,7 @@ async function berthaSend() {
       body: JSON.stringify({session_id: sid, message})
     });
     const data = await res.json();
+    berthaHideTyping();
     if (res.status === 429) {
       berthaAppendMsg('bear', "You're asking faster than I can keep up — give me a minute and try again.");
       return;
@@ -819,6 +878,7 @@ async function berthaSend() {
     }
     berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''));
   } catch (e) {
+    berthaHideTyping();
     document.getElementById('bertha-fallback-note').style.display = 'block';
     berthaAppendMsg('bear', "I'm having trouble right now — try the search below instead.");
   }
