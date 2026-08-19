@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Creek Guide — landing (v0.1 internal, placeholder branding)</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card-bg: #ffffff;
+    --text: #2b2622;
+    --text-dim: #6b6259;
+    --accent: #2f6f4f;
+    --accent-dim: #dcece2;
+    --border: #e7e0d6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+  .internal-banner { background: #3a3530; color: #f0ead9; text-align: center; font-size: 0.75rem; padding: 0.4rem; }
+  .placeholder-note { background: #fbeedd; color: #a15b12; text-align: center; font-size: 0.75rem; padding: 0.4rem; }
+  main { max-width: 640px; margin: 0 auto; padding: 0 1rem; }
+  .hero { text-align: center; padding: 2.5rem 1rem 2rem; }
+  .hero h1 { font-size: 1.7rem; margin: 0 0 0.5rem; }
+  .hero .tagline { font-size: 1.05rem; color: var(--text-dim); margin: 0 0 1.5rem; font-style: italic; }
+  .hero a.cta {
+    display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent); color: white;
+    border-radius: 10px; text-decoration: none; font-size: 1rem; font-weight: 600;
+  }
+  .how-it-works { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 1.5rem 0; text-align: center; }
+  .how-it-works div { font-size: 0.85rem; color: var(--text-dim); }
+  .how-it-works .num { display: block; font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+  .featured-section { margin: 2rem 0; }
+  .featured-section h2 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .featured-section .sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem; }
+  .featured-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  }
+  .featured-card .badge {
+    display: inline-block; margin: 1rem 0 0 1rem; font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.05em; background: var(--accent-dim); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 999px;
+  }
+  .featured-card .body { padding: 0.5rem 1.25rem 1.25rem; }
+  .featured-card h3 { margin: 0.3rem 0 0.5rem; font-size: 1.15rem; }
+  .featured-card p { font-size: 0.9rem; line-height: 1.5; margin: 0 0 0.8rem; }
+  .featured-card .amenities { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.9rem; }
+  .featured-card .actions a {
+    display: inline-block; margin-right: 0.5rem; padding: 0.5rem 0.8rem; border-radius: 8px;
+    text-decoration: none; font-size: 0.82rem; border: 1px solid var(--border); color: var(--text);
+  }
+  .featured-card .actions a.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .why-section { margin: 2.5rem 0; padding: 1.25rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
+  .why-section h2 { font-size: 1rem; margin: 0 0 0.6rem; }
+  .why-section p { font-size: 0.88rem; line-height: 1.6; color: var(--text); margin: 0 0 0.6rem; }
+  footer { text-align: center; font-size: 0.72rem; color: var(--text-dim); padding: 2rem 1rem; }
+</style>
+</head>
+<body>
+
+<div class="internal-banner">INTERNAL PREVIEW — v0.1 — not distributed to any guest — founder review only</div>
+<div class="placeholder-note">Placeholder name/tagline below — real branding pending Council naming brainstorm (in progress). Swap on delivery.</div>
+
+<main>
+  <div class="hero">
+    <h1>Deep Creek Guide</h1>
+    <p class="tagline">"The guide a local would actually hand you."</p>
+    <a class="cta" href="/deep-creek-honestly/explore/guide.html">See the guide →</a>
+  </div>
+
+  <div class="how-it-works">
+    <div><span class="num">1</span>Real local picks, not a generic directory</div>
+    <div><span class="num">2</span>Actually current — hours, status, what's open right now</div>
+    <div><span class="num">3</span>No app, no login, no account needed</div>
+  </div>
+
+  <div class="featured-section">
+    <h2>Our first featured stay</h2>
+    <p class="sub">The beta partner for this launch — a real Deep Creek property, not a stock listing.</p>
+    <div class="featured-card">
+      <span class="badge">Featured Partner</span>
+      <div class="body">
+        <h3>Pinnacle Paradise</h3>
+        <p>A unique log home on over an acre in Swanton, MD, built across four floors and designed for a comfortable, fun stay — two indoor fireplaces, a hot tub, a private dock slip for boat access, a wrap-around porch, and a crow's-nest lookout with lake views from multiple vantage points.</p>
+        <div class="amenities">4 floors · hot tub · dock slip · 2 fireplaces · wrap-around porch · full kitchen · washer/dryer</div>
+        <div class="actions">
+          <a class="primary" href="https://www.pinnacle-paradise.com/" target="_blank">Book direct</a>
+          <a href="https://www.airbnb.com/rooms/48684007" target="_blank">View on Airbnb</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="why-section">
+    <h2>Why this exists</h2>
+    <p>Every DCL-specific directory we could find is either empty where it matters most (no real current info) or thin (auto-generated listings nobody's actually claimed). This is the opposite: a small, real, curated guide — the kind of thing a local would hand you at check-in, kept current on purpose, not left to go stale.</p>
+    <p>Local business? <a href="guide.html#advertise">Learn about featured placement →</a></p>
+  </div>
+</main>
+
+<footer>
+  v0.1 internal build · beta launch partner: Pinnacle Paradise · full guide has 14 curated local places
+</footer>
+
+</body>
+</html>
