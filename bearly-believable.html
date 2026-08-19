@@ -54,6 +54,33 @@
     text-align: center; color: var(--text-dim); font-size: 0.85rem;
   }
   footer { text-align: center; font-size: 0.72rem; color: var(--text-dim); padding: 1.5rem 1rem; }
+
+  .bertha-box { margin: 1rem 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .bertha-head { padding: 0.9rem 1rem; background: var(--accent); color: white; display: flex; align-items: center; gap: 0.6rem; }
+  .bertha-head .avatar { font-size: 1.6rem; }
+  .bertha-head h2 { margin: 0; font-size: 1.05rem; }
+  .bertha-disclosure { font-size: 0.72rem; padding: 0.5rem 1rem; background: var(--accent-dim); color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .bertha-gate { padding: 1rem; font-size: 0.85rem; line-height: 1.5; }
+  .bertha-gate button {
+    margin-top: 0.7rem; padding: 0.6rem 1.1rem; border-radius: 8px; border: none;
+    background: var(--accent); color: white; font-size: 0.88rem; cursor: pointer;
+  }
+  .bertha-log { padding: 0.75rem 1rem; max-height: 50vh; overflow-y: auto; display: none; }
+  .bertha-msg { margin: 0.5rem 0; font-size: 0.88rem; line-height: 1.45; }
+  .bertha-msg.user { text-align: right; }
+  .bertha-msg .bubble { display: inline-block; max-width: 85%; padding: 0.55rem 0.8rem; border-radius: 12px; }
+  .bertha-msg.user .bubble { background: var(--accent); color: white; }
+  .bertha-msg.bear .bubble { background: var(--accent-dim); color: var(--text); }
+  .bertha-msg .cat { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.2rem; }
+  .bertha-input-row { display: none; padding: 0.75rem 1rem 1rem; gap: 0.4rem; }
+  .bertha-input-row input {
+    flex: 1; padding: 0.6rem 0.8rem; font-size: 0.9rem; border: 1px solid var(--border); border-radius: 8px;
+  }
+  .bertha-input-row button {
+    padding: 0.6rem 1rem; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer;
+  }
+  .bertha-fallback-note { padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--warn); background: var(--warn-bg); display: none; }
+  .fallback-toggle { text-align: center; margin: 1.25rem 0 0.5rem; font-size: 0.82rem; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -66,19 +93,39 @@
 
 <main>
   <div class="welcome">
-    Welcome! I'm a local guide put together for guests staying here — search or filter below for what's open right now, and check what's actually close to the house. Everything here is curated, not a big directory — if I don't know something, I'll say so rather than guess.
-    <br><br><em style="color:var(--text-dim); font-size:0.82rem;">A quick heads up: I'm a guide, not a person — put together with local help and reviewed before you see it, not a live chat (yet). Ask Rick directly for anything urgent.</em>
+    Welcome! I'm a local guide put together for guests staying here. Ask me anything about the area below, or browse/search the curated list yourself. Everything here is curated, not a big directory — if I don't know something, I'll say so rather than guess.
   </div>
 
-  <div class="search-bar">
-    <input type="text" id="search" placeholder="Search (e.g. pizza, hiking, open now)...">
-    <div class="filters" id="filters"></div>
+  <div class="bertha-box">
+    <div class="bertha-head"><span class="avatar">🐻</span><h2>Talk to Bertha</h2></div>
+    <div class="bertha-disclosure">Bertha's replies are AI-drafted, not reviewed by a person before you see them. She only knows what's in this local guide — for anything time-sensitive or safety-related, verify with the business directly or ask your host.</div>
+    <div class="bertha-gate" id="bertha-gate">
+      <strong>Before you chat with Bertha:</strong> she's an AI-assisted guide and can make mistakes — verify anything important with the business itself. To help improve her, the text of your questions and her answers is logged for up to 60 days, then deleted; no name, phone, email, or reservation info is collected or stored. Rick is the accountable owner of this data — reach him directly with any concern.
+      <br><button id="bertha-accept">Got it — let's chat</button>
+    </div>
+    <div class="bertha-fallback-note" id="bertha-fallback-note">
+      Bertha's chat isn't reachable right now — use the search/browse below instead. She's just resting, not gone.
+    </div>
+    <div class="bertha-log" id="bertha-log"></div>
+    <div class="bertha-input-row" id="bertha-input-row">
+      <input type="text" id="bertha-input" placeholder="Ask about restaurants, activities, hours, directions...">
+      <button id="bertha-send">Send</button>
+    </div>
   </div>
 
-  <div id="results"></div>
+  <div class="fallback-toggle" id="fallback-toggle">or browse / search the guide yourself ▾</div>
+
+  <div id="search-section" style="display:none;">
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Search (e.g. pizza, hiking, open now)...">
+      <div class="filters" id="filters"></div>
+    </div>
+
+    <div id="results"></div>
+  </div>
 
   <div class="ask-note">
-    Have a question this doesn't answer? A real adaptive Q&amp;A layer is coming — for now, text Rick directly and he'll get you a real answer.
+    Anything urgent or Bertha can't help with? Text Rick directly.
   </div>
 </main>
 
@@ -86,7 +133,7 @@
 <div class="guest-notice" style="max-width:640px; margin:1.5rem auto 0; padding:0.9rem 1rem; font-size:0.82rem; line-height:1.5; color:var(--text-dim);">
   <h3 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--text);">A quick note</h3>
   <p style="margin:0 0 0.6rem;"><strong>What this is:</strong> an informal local guide put together by your host, not an official safety authority. Hours, directions, and details are curated from what we could find and haven't been independently verified — always confirm anything time-sensitive or safety-related directly with the business.</p>
-  <p style="margin:0 0 0.6rem;"><strong>Your privacy:</strong> this page doesn't collect any personal data. It's a static search tool — searching and filtering happens right on your phone and isn't sent, saved, or tracked anywhere.</p>
+  <p style="margin:0 0 0.6rem;"><strong>Your privacy:</strong> browsing and searching the guide list happens right on your phone and isn't sent or tracked anywhere. If you chat with Bertha, the text of your question and her answer is sent to an AI service to generate a reply and logged for up to 60 days to help us improve her, then deleted — no name, phone, email, or reservation/property info is ever collected or stored. Rick is the named owner of this data; reach him directly with any question or concern.</p>
   <p style="margin:0;"><strong>Feedback for a discount:</strong> if you'd like to share detailed feedback about your experience using this guide, we'd love to hear it — and we'll take 10% off your next stay as thanks. This is completely optional and separate from using the guide itself. If you'd like to take us up on it, just reply to your host directly (or use the link/form we send at checkout) — we'll ask what you searched for, what was useful, and what wasn't. Nothing is collected unless you choose to send it, and it's used only to improve this guide and honor your discount.</p>
 </div>
 
@@ -682,6 +729,104 @@ document.getElementById('filters').addEventListener('click', e => {
 });
 
 render();
+
+// --- Bearly-Bertha chat ---
+const BERTHA_API = 'https://decision-desk-ai.tail0a94a7.ts.net';
+const TERMS_VERSION = 'bertha-v0.1-2026-08-19';
+
+function berthaSessionId() {
+  let sid = localStorage.getItem('bertha_session_id');
+  if (!sid) {
+    sid = crypto.randomUUID();
+    localStorage.setItem('bertha_session_id', sid);
+  }
+  return sid;
+}
+
+function berthaAccepted() {
+  return localStorage.getItem('bertha_terms_version') === TERMS_VERSION;
+}
+
+function berthaShowChatUI() {
+  document.getElementById('bertha-gate').style.display = 'none';
+  document.getElementById('bertha-log').style.display = 'block';
+  document.getElementById('bertha-input-row').style.display = 'flex';
+}
+
+function berthaAppendMsg(role, text, cat) {
+  const log = document.getElementById('bertha-log');
+  const div = document.createElement('div');
+  div.className = 'bertha-msg ' + role;
+  div.innerHTML = `<div class="bubble"></div>` + (cat ? `<div class="cat">${cat}</div>` : '');
+  div.querySelector('.bubble').textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function berthaAccept() {
+  const sid = berthaSessionId();
+  try {
+    const res = await fetch(BERTHA_API + '/terms/accept', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({session_id: sid})
+    });
+    if (!res.ok) throw new Error('bad response');
+    localStorage.setItem('bertha_terms_version', TERMS_VERSION);
+    berthaShowChatUI();
+  } catch (e) {
+    document.getElementById('bertha-fallback-note').style.display = 'block';
+  }
+}
+
+async function berthaSend() {
+  const input = document.getElementById('bertha-input');
+  const message = input.value.trim();
+  if (!message) return;
+  input.value = '';
+  berthaAppendMsg('user', message);
+  const sid = berthaSessionId();
+  try {
+    const res = await fetch(BERTHA_API + '/chat', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({session_id: sid, message})
+    });
+    const data = await res.json();
+    if (res.status === 429) {
+      berthaAppendMsg('bear', "You're asking faster than I can keep up — give me a minute and try again.");
+      return;
+    }
+    if (res.status === 403 && data.code === 'terms_required') {
+      document.getElementById('bertha-gate').style.display = 'block';
+      document.getElementById('bertha-log').style.display = 'none';
+      document.getElementById('bertha-input-row').style.display = 'none';
+      return;
+    }
+    if (!data.ai_available) {
+      document.getElementById('bertha-fallback-note').style.display = 'block';
+      berthaAppendMsg('bear', "I'm having trouble right now — try the search below instead.");
+      return;
+    }
+    berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''));
+  } catch (e) {
+    document.getElementById('bertha-fallback-note').style.display = 'block';
+    berthaAppendMsg('bear', "I'm having trouble right now — try the search below instead.");
+  }
+}
+
+document.getElementById('bertha-accept').addEventListener('click', berthaAccept);
+document.getElementById('bertha-send').addEventListener('click', berthaSend);
+document.getElementById('bertha-input').addEventListener('keydown', e => { if (e.key === 'Enter') berthaSend(); });
+document.getElementById('fallback-toggle').addEventListener('click', () => {
+  const sec = document.getElementById('search-section');
+  sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+});
+
+if (berthaAccepted()) berthaShowChatUI();
+
+// Confirm the backend is actually reachable before a guest ever tries to type.
+fetch(BERTHA_API + '/health').catch(() => {
+  document.getElementById('bertha-fallback-note').style.display = 'block';
+});
 </script>
 </body>
 </html>
