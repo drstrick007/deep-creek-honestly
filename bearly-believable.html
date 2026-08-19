@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bearly Believable — Local Guide</title>
+<style>
+  :root {
+    --bg: #faf7f2; --card-bg: #ffffff; --text: #2b2622; --text-dim: #6b6259;
+    --accent: #2f6f4f; --accent-dim: #dcece2; --border: #e7e0d6;
+    --warn: #a15b12; --warn-bg: #fbeedd; --danger: #a13a2f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 3rem; }
+  header { padding: 1.5rem 1rem 1.25rem; background: var(--accent); color: white; text-align: center; }
+  header .persona { font-size: 2rem; margin-bottom: 0.2rem; }
+  header h1 { margin: 0 0 0.3rem; font-size: 1.4rem; }
+  header p { margin: 0; font-size: 0.88rem; opacity: 0.92; }
+  main { max-width: 640px; margin: 0 auto; padding: 0 0.75rem; }
+  .welcome {
+    margin: 1rem 0; padding: 1rem; background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; font-size: 0.9rem; line-height: 1.5;
+  }
+  .search-bar { position: sticky; top: 0; background: var(--bg); padding: 0.75rem 0; z-index: 10; }
+  .search-bar input {
+    width: 100%; padding: 0.7rem 0.9rem; font-size: 0.95rem; border: 1px solid var(--border);
+    border-radius: 10px; background: white;
+  }
+  .filters { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  .filters button {
+    font-size: 0.78rem; padding: 0.35rem 0.7rem; border-radius: 999px; border: 1px solid var(--border);
+    background: white; color: var(--text); cursor: pointer;
+  }
+  .filters button.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .category { margin-top: 1.25rem; font-size: 1rem; font-weight: 600; padding-bottom: 0.25rem; border-bottom: 2px solid var(--border); }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; margin: 0.6rem 0; overflow: hidden; }
+  .card-body { padding: 0.7rem 0.9rem 0.85rem; }
+  .card h3 { margin: 0 0 0.25rem; font-size: 1.02rem; }
+  .badges { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+  .badge { font-size: 0.68rem; padding: 0.18rem 0.5rem; border-radius: 999px; font-weight: 600; }
+  .badge.open { background: #dcf0dc; color: #1f6b1f; }
+  .badge.closed { background: #f0e6e0; color: #7a4a2f; }
+  .badge.unknown { background: #eee8de; color: var(--text-dim); }
+  .tip { font-size: 0.85rem; line-height: 1.4; margin: 0 0 0.5rem; white-space: pre-line; }
+  .from-here { font-size: 0.78rem; color: var(--accent); font-weight: 600; margin-bottom: 0.5rem; }
+  .actions a {
+    font-size: 0.78rem; padding: 0.4rem 0.65rem; border-radius: 7px; text-decoration: none;
+    border: 1px solid var(--border); color: var(--text); margin-right: 0.4rem;
+  }
+  .actions a.primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .no-results { text-align: center; padding: 2rem 1rem; color: var(--text-dim); font-size: 0.9rem; }
+  .ask-note {
+    margin: 2rem 0 1rem; padding: 1rem; border: 1px dashed var(--border); border-radius: 10px;
+    text-align: center; color: var(--text-dim); font-size: 0.85rem;
+  }
+  footer { text-align: center; font-size: 0.72rem; color: var(--text-dim); padding: 1.5rem 1rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="persona">🐻</div>
+  <h1>Hi, I'm Bearly-Betha!</h1>
+  <p>Your local guide for the stay at Bearly Believable — 160 Leo Friend Road</p>
+</header>
+
+<main>
+  <div class="welcome">
+    Welcome! I'm a local guide put together for guests staying here — search or filter below for what's open right now, and check what's actually close to the house. Everything here is curated, not a big directory — if I don't know something, I'll say so rather than guess.
+    <br><br><em style="color:var(--text-dim); font-size:0.82rem;">A quick heads up: I'm a guide, not a person — put together with local help and reviewed before you see it, not a live chat (yet). Ask Rick directly for anything urgent.</em>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search (e.g. pizza, hiking, open now)...">
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="ask-note">
+    Have a question this doesn't answer? A real adaptive Q&amp;A layer is coming — for now, text Rick directly and he'll get you a real answer.
+  </div>
+</main>
+
+
+<div class="guest-notice" style="max-width:640px; margin:1.5rem auto 0; padding:0.9rem 1rem; font-size:0.82rem; line-height:1.5; color:var(--text-dim);">
+  <h3 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--text);">A quick note</h3>
+  <p style="margin:0 0 0.6rem;"><strong>What this is:</strong> an informal local guide put together by your host, not an official safety authority. Hours, directions, and details are curated from what we could find and haven't been independently verified — always confirm anything time-sensitive or safety-related directly with the business.</p>
+  <p style="margin:0 0 0.6rem;"><strong>Your privacy:</strong> this page doesn't collect any personal data. It's a static search tool — searching and filtering happens right on your phone and isn't sent, saved, or tracked anywhere.</p>
+  <p style="margin:0;"><strong>Feedback for a discount:</strong> if you'd like to share detailed feedback about your experience using this guide, we'd love to hear it — and we'll take 10% off your next stay as thanks. This is completely optional and separate from using the guide itself. If you'd like to take us up on it, just reply to your host directly (or use the link/form we send at checkout) — we'll ask what you searched for, what was useful, and what wasn't. Nothing is collected unless you choose to send it, and it's used only to improve this guide and honor your discount.</p>
+</div>
+
+<footer>
+  Bearly Believable guest guide · shared privately with this reservation only
+</footer>
+
+<script id="ring1-data" type="application/json">{
+  "ring1_places": [
+    {
+      "id": "brendas-pizzeria",
+      "name": "Brenda's Pizzeria",
+      "category": "Food scene",
+      "tip": "One of the best pizza joints and morning coffee and breakfast places, a few minutes from most Deep Creek rentals. Their X-Large 26 inch pizza \"Abbondonza\" is not even on the menu to control orders, but ask for it - it will not even fit in the back seat of an SUV - prepare your trunk.\n\nMondays they have their half-price-pizza specials.",
+      "lat": 39.522631,
+      "lng": -79.333756,
+      "photos": [
+        "https://a0.muscache.com/im/pictures/user/e82dc507-9861-4bef-862f-eb824ae902d8.jpg?aki_policy=profile_x_medium"
+      ],
+      "source_url": "https://www.brendaspizzeria.com/",
+      "address": "21311 Garrett Hwy, Oakland, MD 21550",
+      "phone": "+13013871007",
+      "hours_reported": "Sun-Thu 11am-9pm, Fri-Sat 11am-10pm (Labor Day onward; daily 11am-10pm before)",
+      "hours_structured": [
+        {
+          "days": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "open": "11:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            5,
+            6
+          ],
+          "open": "11:00",
+          "close": "22:00"
+        }
+      ],
+      "paii_description": "New York-style pizzeria and breakfast spot; fresh-made dough daily, known for a 26-inch specialty pizza.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "mountain-state-brewing",
+      "name": "Mountain State Brewing Co",
+      "category": "Food scene",
+      "tip": "Great food, gourmet pizza, and selection of draft beers and spirits. Perfect for date night, group lunch or dinner, kids and families.\n\nYou HAVE TO reserve a heated igloo dining area well in advance but it is worth it (6 people max)",
+      "lat": 39.5644479,
+      "lng": -79.3813426,
+      "photos": [],
+      "source_url": null,
+      "source_gap": "official site (msbcdeepcreek.com) blocks automated fetch (HTTP 403) -- see 11_ring1_source_map.md",
+      "address": "6690 Sang Run Rd, McHenry, MD 21541",
+      "phone": "+13013873360",
+      "hours_reported": "Mon 12-9pm, Tue-Wed 4-9pm, Thu 12-9pm, Fri-Sat 12-11pm, Sun 12-9pm",
+      "hours_structured": [
+        {
+          "days": [
+            1
+          ],
+          "open": "12:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            2,
+            3
+          ],
+          "open": "16:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            4
+          ],
+          "open": "12:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            5,
+            6
+          ],
+          "open": "12:00",
+          "close": "23:00"
+        },
+        {
+          "days": [
+            0
+          ],
+          "open": "12:00",
+          "close": "21:00"
+        }
+      ],
+      "paii_description": "Brewpub and restaurant on Sang Run Rd, McHenry -- flatbread pizzas, house beers, heated igloo dining in winter.",
+      "freshness": null
+    },
+    {
+      "id": "aces-run",
+      "name": "Ace's Run Restaurant & Pub",
+      "category": "Food scene",
+      "tip": "Recently went here for first time. Beautiful and cozy wood decor with expansive lake views. Food was great and they have a happy hour until 6pm.\n\n\"A great place to meet friends for great food and fun. Ace's Run, located at the historic Will O' The Wisp, is a classic spot with an amazing view of DCL!\"",
+      "lat": 39.5089341,
+      "lng": -79.3230997,
+      "photos": [],
+      "source_url": "https://www.acesrun.com/",
+      "address": "20160 Garrett Hwy, Oakland, MD 21550",
+      "phone": "+13013876688",
+      "hours_reported": "Sun-Thu 11am-9pm, Fri-Sat 11am-10pm",
+      "hours_structured": [
+        {
+          "days": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "open": "11:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            5,
+            6
+          ],
+          "open": "11:00",
+          "close": "22:00"
+        }
+      ],
+      "paii_description": "Lakefront restaurant and pub at the historic Will O' The Wisp site; happy hour, balcony dining, boat docks.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "swallow-falls-trail",
+      "name": "Swallow Falls Trail",
+      "category": "Sightseeing",
+      "tip": "Less than 15 minute drive from most Deep Creek rentals",
+      "lat": 39.4949921,
+      "lng": -79.4347452,
+      "photos": [],
+      "source_url": "https://dnr.maryland.gov/publiclands/pages/western/swallowfalls.aspx",
+      "address": "2470 Maple Glade Road, Oakland, MD 21550",
+      "phone": "+13013876938",
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Maryland state park trail system; sunrise-to-sunset access, no posted business hours.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "trailside-way",
+      "name": "Trailside Way",
+      "category": "Sightseeing",
+      "tip": "Like to hike? Great extensive trails for the experienced and hardcore explorers as well.",
+      "lat": 39.5001622,
+      "lng": -79.3218822,
+      "photos": [],
+      "source_url": "https://www.garretttrails.org",
+      "address": null,
+      "phone": null,
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Regional hiking trail network maintained by Garrett Trails; no posted business hours.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "muddy-creek-falls",
+      "name": "Muddy Creek Falls",
+      "category": "Sightseeing",
+      "tip": "Another amazing short hike away in Oakland. No better break across all 4 seasons than a visit to Maryland's tallest waterfall",
+      "lat": 39.5012023,
+      "lng": -79.41782099999999,
+      "photos": [],
+      "source_url": "https://dnr.maryland.gov/publiclands/pages/western/swallowfalls.aspx",
+      "address": "Swallow Falls State Park, Oakland, MD",
+      "phone": "+13013876938",
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Maryland's tallest waterfall, inside Swallow Falls State Park; sunrise-to-sunset access.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "herrington-manor",
+      "name": "Herrington Manor State Park",
+      "category": "Sightseeing",
+      "tip": "This park has a great beach where you can rent kayaks and Paddle boards without motorboats around.",
+      "lat": 39.4533,
+      "lng": -79.44589,
+      "photos": [],
+      "source_url": "https://dnr.maryland.gov/publiclands/Pages/western/herrington.aspx",
+      "address": null,
+      "phone": null,
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Maryland state park with a lake beach, kayak/paddleboard rental, and a winter sledding hill.",
+      "also_in": [
+        "Snow Sledding places in Garrett County"
+      ],
+      "sledding_note": "Sledding hill next to the park office, lit for night sledding. Also: hill at Southern Middle School.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "arrowhead-market",
+      "name": "Arrowhead Market",
+      "category": "Shopping",
+      "tip": "Just off Garrett Highway, Arrowhead Market is great for:\n\n- Gas\n- All kinds of food, drinks, dry goods\n- Truly one-stop-shopping\n- Deli (hot and cold food) *** 24 HOURS A DAY\n  - getting a fresh-made roast beef sandwich on rye bread at midnight after winning at pool or poker is amazing",
+      "lat": 39.5040512,
+      "lng": -79.3253402,
+      "photos": [],
+      "source_url": "https://arrowheadmarket.com/",
+      "source_low_confidence": true,
+      "address": "19746 Garrett Hwy, Oakland, MD 21550",
+      "phone": "+13013874020",
+      "hours_reported": "Mon-Thu 6am-12am, Fri-Sun 6am-1am",
+      "hours_structured": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "open": "06:00",
+          "close": "24:00"
+        },
+        {
+          "days": [
+            5,
+            6,
+            0
+          ],
+          "open": "06:00",
+          "close": "25:00"
+        }
+      ],
+      "paii_description": "One-stop grocery, deli, gas, and convenience store on Garrett Hwy; deli open until 1am on weekends.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "shop-n-save",
+      "name": "Shop n Save",
+      "category": "Shopping",
+      "tip": "A full service grocery store in McHenry, not far past the bridge on Garrett Highway.\n\nArrowhead Market has better deli sandwiches IMHO, but still a convenient place to shop for all the wonderful meals you will cook during your stay.",
+      "lat": 39.400085,
+      "lng": -79.392371,
+      "photos": [],
+      "source_url": "https://www.shopnsavefood.com/StoreLocator/Store/?L=1077&S=",
+      "address": "24586 Garrett Hwy, McHenry, MD 21541",
+      "phone": "+13013874075",
+      "hours_reported": "Mon-Thu 7am-9pm, Fri-Sat 7am-10pm, Sun 7am-9pm",
+      "hours_structured": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "open": "07:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            5,
+            6
+          ],
+          "open": "07:00",
+          "close": "22:00"
+        },
+        {
+          "days": [
+            0
+          ],
+          "open": "07:00",
+          "close": "21:00"
+        }
+      ],
+      "paii_description": "Full-service supermarket in McHenry with a butcher shop, fresh seafood, deli, and bakery.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "asci",
+      "name": "Adventure Sports Center International",
+      "category": "Adventure",
+      "tip": "Whitewater Rafting, For Kayaking, Rock Climbing, Hiking, Biking, and more - just a few miles away",
+      "lat": 39.5468355,
+      "lng": -79.3716328,
+      "photos": [],
+      "source_url": "https://www.visitmaryland.org/listing/attraction/adventure-sports-center-international",
+      "source_low_confidence": true,
+      "source_gap": "no first-party website found this pass -- source is a third-party state-tourism listing only",
+      "address": "250 Adventure Sports Way, McHenry, MD 21541",
+      "phone": "+13013873250",
+      "hours_reported": "reported 9am-5pm daily; may vary seasonally, unverified",
+      "hours_structured": [
+        {
+          "days": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "open": "09:00",
+          "close": "17:00"
+        }
+      ],
+      "paii_description": "Whitewater rafting, kayaking, rock climbing, and biking center; reported hours only, may vary seasonally.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 403,
+        "resolution": "source_failure",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "broken-spoke-stables",
+      "name": "Broken Spoke Stables",
+      "category": "Adventure",
+      "tip": "If you are looking to take some riding lessons for yourself or your children then you need look no further. We've instructed over a thousand clients how to ride and that alone should speak volumes about our program considering we don't do much advertising. Our lesson horses are amazing.",
+      "lat": 39.3762016,
+      "lng": -79.38414759999999,
+      "photos": [],
+      "source_url": "http://www.brokenspokestable.net/",
+      "address": null,
+      "phone": "+13016164681",
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Full-service equestrian center offering trail rides, riding lessons, and hayrides.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "monkey-business",
+      "name": "Monkey Business Adventure Park",
+      "category": "Adventure",
+      "tip": "An aerial adventure park featuring ziplines, free falling, and obstacle courses for visitors of all ages and more! -- Just 3 minutes away, just across the bridge to McHenry and you'll find unique overlooking the lake.",
+      "lat": 39.543671,
+      "lng": -79.35121099999999,
+      "photos": [],
+      "source_url": "https://dcladventures.com/monkey-business-adventure-park/",
+      "address": "970 Deep Creek Dr, McHenry, MD 21541",
+      "phone": "+18663257627",
+      "hours_reported": "Mon-Thu 11am-6pm, Fri-Sat 11am-9pm, Sun 11am-4pm",
+      "hours_structured": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "open": "11:00",
+          "close": "18:00"
+        },
+        {
+          "days": [
+            5,
+            6
+          ],
+          "open": "11:00",
+          "close": "21:00"
+        },
+        {
+          "days": [
+            0
+          ],
+          "open": "11:00",
+          "close": "16:00"
+        }
+      ],
+      "paii_description": "Aerial adventure park with ziplines and obstacle courses across three difficulty tiers.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    },
+    {
+      "id": "boat-rentals",
+      "name": "Deep Creek Lake Boat Rentals",
+      "category": "Adventure",
+      "tip": "Let's get ourselves on the water ASAP! Call for reservations as soon as your dates are set",
+      "lat": 39.5573323,
+      "lng": -79.35309699999999,
+      "photos": [],
+      "source_url": null,
+      "source_gap": "ambiguous entity -- Rick's tip names no specific vendor; multiple real candidates found (Crystal Waters, Bill's Marine Service, Fun Time Watersports, dclboatrentals.com, dclakelife.com), none confirmed as the one meant -- see 11_ring1_source_map.md",
+      "address": null,
+      "phone": null,
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Entity in Rick's original tip is ambiguous -- see source map; no confirmed vendor to source hours from.",
+      "freshness": null
+    },
+    {
+      "id": "aquatic-center",
+      "name": "Aquatic Center",
+      "category": "Adventure",
+      "tip": "Yet another place to rent some speed-time on the lake.",
+      "lat": 39.53875,
+      "lng": -79.347971,
+      "photos": [],
+      "source_url": "https://www.aquatic-center.com/",
+      "address": null,
+      "phone": "+13013878233",
+      "hours_reported": null,
+      "hours_structured": null,
+      "paii_description": "Authorized boat/watercraft dealer and rental outfit on the lake; pontoon, jet ski, kayak, and paddleboard rentals.",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    }
+  ],
+  "dcl_now": [
+    {
+      "id": "wisp-mountain-report",
+      "name": "Wisp Resort \u2014 Mountain Report",
+      "note": "Wisp Resort runs its own live-conditions page (open trails, snowfall, mountain cams). Closes a Council evidence gap -- previously unverified whether Wisp had an EpicMix/OnTheSnow-equivalent product. It does.",
+      "source_url": "https://www.wispresort.com/mountain-report-cams/",
+      "freshness": {
+        "checked_at": "2026-08-19T01:59:09.091394+00:00",
+        "http_status": 200,
+        "resolution": "auto_first_baseline",
+        "human_exception": false
+      }
+    }
+  ]
+}</script>
+<script>
+const data = JSON.parse(document.getElementById('ring1-data').textContent);
+const HOME_LAT = 39.4079, HOME_LNG = -79.4067; // Oakland, MD area centroid -- not the exact parcel; refine with real geocode when time allows
+
+function toMinutes(hhmm) { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; }
+
+function isOpenNow(hoursStructured) {
+  if (!hoursStructured) return null;
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const day = now.getDay();
+  const prevDay = (day + 6) % 7;
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  for (const range of hoursStructured) {
+    if (!range.days.includes(day)) continue;
+    const openM = toMinutes(range.open);
+    const closeM = Math.min(toMinutes(range.close), 1440);
+    if (minutesNow >= openM && minutesNow < closeM) return true;
+  }
+  for (const range of hoursStructured) {
+    if (!range.days.includes(prevDay)) continue;
+    const closeM = toMinutes(range.close);
+    if (closeM > 1440 && minutesNow < closeM - 1440) return true;
+  }
+  return false;
+}
+
+function distanceMiles(lat, lng) {
+  if (!lat || !lng) return null;
+  const R = 3958.8;
+  const dLat = (lat - HOME_LAT) * Math.PI / 180;
+  const dLng = (lng - HOME_LNG) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(HOME_LAT*Math.PI/180)*Math.cos(lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function openBadge(place) {
+  if (place.source_gap) return `<span class="badge unknown">hours unknown</span>`;
+  const open = isOpenNow(place.hours_structured);
+  if (open === null) return `<span class="badge unknown">hours vary</span>`;
+  return open ? `<span class="badge open">open now</span>` : `<span class="badge closed">closed now</span>`;
+}
+
+function renderCard(place) {
+  const dist = distanceMiles(place.lat, place.lng);
+  const distText = dist !== null ? `${dist.toFixed(1)} mi from the house` : '';
+  const dest = place.lat ? `https://maps.apple.com/?daddr=${place.lat},${place.lng}` : '';
+  return `
+    <div class="card" data-name="${place.name.toLowerCase()}" data-category="${place.category}" data-open="${isOpenNow(place.hours_structured)}">
+      <div class="card-body">
+        <h3>${place.name}</h3>
+        <div class="badges">${openBadge(place)}</div>
+        ${distText ? `<div class="from-here">${distText}</div>` : ''}
+        <p class="tip">${place.tip}</p>
+        <div class="actions">
+          ${dest ? `<a class="primary" href="${dest}" target="_blank">Directions</a>` : ''}
+          ${place.phone ? `<a href="tel:${place.phone}">Call</a>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+const categories = [...new Set(data.ring1_places.map(p => p.category))];
+document.getElementById('filters').innerHTML =
+  `<button class="active" data-filter="all">All</button>` +
+  categories.map(c => `<button data-filter="${c}">${c}</button>`).join('') +
+  `<button data-filter="open">Open now</button>`;
+
+let activeFilter = 'all';
+let searchTerm = '';
+
+function render() {
+  const container = document.getElementById('results');
+  let places = data.ring1_places;
+  if (activeFilter === 'open') {
+    places = places.filter(p => isOpenNow(p.hours_structured) === true);
+  } else if (activeFilter !== 'all') {
+    places = places.filter(p => p.category === activeFilter);
+  }
+  if (searchTerm) {
+    places = places.filter(p =>
+      p.name.toLowerCase().includes(searchTerm) ||
+      p.tip.toLowerCase().includes(searchTerm) ||
+      p.category.toLowerCase().includes(searchTerm)
+    );
+  }
+  if (places.length === 0) {
+    container.innerHTML = `<div class="no-results">Nothing matches that — try a different search, or ask Rick directly.</div>`;
+    return;
+  }
+  const byCategory = {};
+  for (const p of places) { (byCategory[p.category] = byCategory[p.category] || []).push(p); }
+  let html = '';
+  for (const [cat, items] of Object.entries(byCategory)) {
+    html += `<div class="category">${cat}</div>` + items.map(renderCard).join('');
+  }
+  container.innerHTML = html;
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase();
+  render();
+});
+document.getElementById('filters').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeFilter = e.target.dataset.filter;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
