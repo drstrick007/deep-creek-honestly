@@ -116,6 +116,18 @@
   .bertha-input-row button:hover { transform: translateY(-1px); }
   .bertha-fallback-note { padding: 0.75rem 1.1rem; font-size: 0.8rem; color: var(--warn); background: var(--warn-bg); display: none; }
   .fallback-toggle { text-align: center; margin: 1.25rem 0 0.5rem; font-size: 0.82rem; color: var(--accent); cursor: pointer; }
+
+  .nav-chooser { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.35rem; }
+  .nav-chooser a {
+    font-size: 0.74rem; padding: 0.32rem 0.6rem; border-radius: 999px; text-decoration: none;
+    border: 1px solid var(--border); color: var(--text); background: white; font-weight: 600;
+  }
+  .nav-chooser a:hover { border-color: var(--accent); color: var(--accent); }
+  .bertha-place-card { background: #f7f5f0; border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 0.9rem; margin: 0.4rem 0 0.7rem; font-size: 0.85rem; }
+  .bertha-place-card h4 { margin: 0 0 0.25rem; font-size: 0.92rem; }
+  .bertha-place-card .from-here { font-size: 0.74rem; color: var(--accent); font-weight: 600; margin-bottom: 0.3rem; }
+  .bertha-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .header-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 </style>
 </head>
 <body>
@@ -126,7 +138,7 @@
 </div>
 
 <header>
-  <div class="persona">🐻</div>
+  <div class="persona" id="header-avatar">🐻</div>
   <h1>Hi, I'm Bertha!</h1>
   <p>Your local guide for the stay at Bearly Believable</p>
 </header>
@@ -138,7 +150,7 @@
 
   <div class="bertha-box">
     <div class="bertha-head">
-      <span class="avatar">🐻</span>
+      <span class="avatar" id="chat-avatar">🐻</span>
       <div><h2>Talk to Bertha</h2><div class="status"><span class="dot"></span>AI-assisted local guide</div></div>
     </div>
     <div class="bertha-disclosure">Bertha's replies are AI-drafted, not reviewed by a person before you see them. She only knows what's in this local guide — for anything time-sensitive or safety-related, verify with the business directly or ask your host.</div>
@@ -714,10 +726,68 @@ function openBadge(place) {
   return open ? `<span class="badge open">open now</span>` : `<span class="badge closed">closed now</span>`;
 }
 
+// --- Navigation: Apple Maps / Google Maps / Waze chooser ---
+// Real, current deep-link schemes (verified, not guessed):
+//   Apple:  https://maps.apple.com/?daddr=<lat>,<lng>
+//   Google: https://www.google.com/maps/dir/?api=1&destination=<lat>,<lng>&travelmode=driving
+//   Waze:   https://www.waze.com/ul?ll=<lat>,<lng>&navigate=yes
+function navLinks(lat, lng) {
+  return {
+    apple: `https://maps.apple.com/?daddr=${lat},${lng}`,
+    google: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`,
+    waze: `https://www.waze.com/ul?ll=${lat},${lng}&navigate=yes`,
+  };
+}
+
+function navChooserHTML(place, sourceSurface) {
+  if (!place.lat || !place.lng) return '';
+  const links = navLinks(place.lat, place.lng);
+  const id = place.id, name = place.name.replace(/"/g, '&quot;');
+  return `
+    <div class="nav-chooser" data-shown-logged="0" data-dest-id="${id}" data-dest-name="${name}" data-source="${sourceSurface}">
+      <a href="${links.apple}" target="_blank" data-provider="apple">Apple Maps</a>
+      <a href="${links.google}" target="_blank" data-provider="google">Google Maps</a>
+      <a href="${links.waze}" target="_blank" data-provider="waze">Waze</a>
+    </div>`;
+}
+
+function logNavEvent(event, destId, destName, provider, sourceSurface) {
+  fetch(BERTHA_API + '/event', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      session_id: berthaSessionId(), event, destination_id: destId,
+      destination_name: destName, provider: provider || null, source_surface: sourceSurface,
+    }),
+  }).catch(() => {});
+}
+
+// Event delegation: log directions_clicked on any nav-chooser link, log
+// directions_button_shown once per chooser via IntersectionObserver.
+document.addEventListener('click', e => {
+  const a = e.target.closest('.nav-chooser a');
+  if (!a) return;
+  const chooser = a.closest('.nav-chooser');
+  logNavEvent('directions_clicked', chooser.dataset.destId, chooser.dataset.destName, a.dataset.provider, chooser.dataset.source);
+});
+
+const navShownObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const chooser = entry.target;
+    if (chooser.dataset.shownLogged === '1') return;
+    chooser.dataset.shownLogged = '1';
+    logNavEvent('directions_button_shown', chooser.dataset.destId, chooser.dataset.destName, null, chooser.dataset.source);
+    navShownObserver.unobserve(chooser);
+  });
+}, { threshold: 0.5 });
+
+function observeNavChoosers(root) {
+  root.querySelectorAll('.nav-chooser').forEach(el => navShownObserver.observe(el));
+}
+
 function renderCard(place) {
   const dist = distanceMiles(place.lat, place.lng);
   const distText = dist !== null ? `${dist.toFixed(1)} mi from the house` : '';
-  const dest = place.lat ? `https://maps.apple.com/?daddr=${place.lat},${place.lng}` : '';
   return `
     <div class="card" data-name="${place.name.toLowerCase()}" data-category="${place.category}" data-open="${isOpenNow(place.hours_structured)}">
       <div class="card-body">
@@ -726,9 +796,9 @@ function renderCard(place) {
         ${distText ? `<div class="from-here">${distText}</div>` : ''}
         <p class="tip">${place.tip}</p>
         <div class="actions">
-          ${dest ? `<a class="primary" href="${dest}" target="_blank">Directions</a>` : ''}
           ${place.phone ? `<a href="tel:${place.phone}">Call</a>` : ''}
         </div>
+        ${navChooserHTML(place, 'search_card')}
       </div>
     </div>`;
 }
@@ -768,6 +838,7 @@ function render() {
     html += `<div class="category">${cat}</div>` + items.map(renderCard).join('');
   }
   container.innerHTML = html;
+  observeNavChoosers(container);
 }
 
 document.getElementById('search').addEventListener('input', e => {
@@ -787,6 +858,39 @@ render();
 // --- Bearly-Bertha chat ---
 const BERTHA_API = 'https://decision-desk-ai.tail0a94a7.ts.net';
 const TERMS_VERSION = 'bertha-v0.1-2026-08-19';
+const placeById = Object.fromEntries(data.ring1_places.map(p => [p.id, p]));
+
+// --- Adaptive Bertha visual mode (per BERTHA BETA V1 directive, 2026-08-19) ---
+// No real artwork exists yet -- Rick + MP generate it separately, offline. Until a
+// mode's manifest entry has approved:true, render its placeholder_emoji instead of
+// a request that would just 404. Dropping an approved file at asset_dir+filename and
+// flipping approved:true makes it appear with zero code changes here.
+let BERTHA_ASSETS = null;
+let currentMode = 'bertha_default';
+fetch('bertha_assets.json').then(r => r.json()).then(m => { BERTHA_ASSETS = m; }).catch(() => {});
+
+function applyBerthaMode(modeId, source) {
+  if (!modeId || modeId === currentMode || !BERTHA_ASSETS) return;
+  const mode = BERTHA_ASSETS.modes.find(m => m.mode_id === modeId) || BERTHA_ASSETS.modes.find(m => m.mode_id === 'bertha_default');
+  currentMode = modeId;
+  [['header-avatar', false], ['chat-avatar', true]].forEach(([elId, small]) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (mode.approved) {
+      el.innerHTML = `<img class="${small ? 'bertha-avatar-img' : 'header-avatar-img'}" src="${BERTHA_ASSETS.asset_dir}${mode.filename}" alt="${mode.alt_text}" onerror="this.parentElement.textContent='${mode.placeholder_emoji}'">`;
+    } else {
+      el.textContent = mode.placeholder_emoji;
+    }
+  });
+  logVisualEvent('bertha_visual_shown', modeId, source);
+}
+
+function logVisualEvent(event, modeId, source) {
+  fetch(BERTHA_API + '/event', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ session_id: berthaSessionId(), event, mode_id: modeId, mode_source: source }),
+  }).catch(() => {});
+}
 
 function berthaSessionId() {
   let sid = localStorage.getItem('bertha_session_id');
@@ -814,6 +918,25 @@ function berthaAppendMsg(role, text, cat) {
   div.innerHTML = `<div class="bubble"></div>` + (cat ? `<div class="cat">${cat}</div>` : '');
   div.querySelector('.bubble').textContent = text;
   log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function berthaAppendPlaceCards(placeIds) {
+  const log = document.getElementById('bertha-log');
+  const places = placeIds.map(id => placeById[id]).filter(Boolean);
+  if (!places.length) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = places.map(place => {
+    const dist = distanceMiles(place.lat, place.lng);
+    const distText = dist !== null ? `${dist.toFixed(1)} mi from the house` : '';
+    return `<div class="bertha-place-card">
+      <h4>${place.name}</h4>
+      ${distText ? `<div class="from-here">${distText}</div>` : ''}
+      ${navChooserHTML(place, 'bertha_chat')}
+    </div>`;
+  }).join('');
+  log.appendChild(wrap);
+  observeNavChoosers(wrap);
   log.scrollTop = log.scrollHeight;
 }
 
@@ -877,6 +1000,8 @@ async function berthaSend() {
       return;
     }
     berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''));
+    if (data.place_ids && data.place_ids.length) berthaAppendPlaceCards(data.place_ids);
+    if (data.mode_id) applyBerthaMode(data.mode_id, 'user_question');
   } catch (e) {
     berthaHideTyping();
     document.getElementById('bertha-fallback-note').style.display = 'block';
