@@ -1069,7 +1069,17 @@ function applyBerthaMode(modeId, source) {
   if (!modeId || modeId === currentMode || !BERTHA_ASSETS) return;
   const mode = _resolveApprovedMode(modeId);
   currentMode = modeId;
-  [['header-avatar', false], ['chat-avatar', true]].forEach(([elId, small]) => {
+  // 2026-08-20, real bug from Rick's own live screenshot: the "Hi, I'm Bertha!"
+  // welcome hero (header-avatar) was sharing live mode state with the "Talk to
+  // Bertha" bar (chat-avatar) -- the first time any chat turn set a specific mode
+  // (e.g. a Wisp/ski question), the welcome hero permanently switched to that
+  // artwork too and never reverted, even scrolled back to the top, even though
+  // it's static introductory content, not a live status indicator. Only the
+  // one-time page-load call is allowed to set header-avatar now; conversation
+  // turns update chat-avatar (and the per-message avatars built for exactly this
+  // "what's Bertha's current state" purpose) but leave the welcome hero alone.
+  const targets = source === 'page_load' ? [['header-avatar', false], ['chat-avatar', true]] : [['chat-avatar', true]];
+  targets.forEach(([elId, small]) => {
     const el = document.getElementById(elId);
     if (!el) return;
     if (mode.approved) {
