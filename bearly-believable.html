@@ -1120,9 +1120,18 @@ async function berthaSend() {
   berthaShowTyping();
   const sid = berthaSessionId();
   try {
+    // 2026-08-20, Joseph's live beta: real, isolated guest experiences on the same
+    // page/codebase, no forks. Default (no ?experience= param) = Joseph, the real
+    // current guest, unchanged. ?experience=fleitas_family_test is Rick's own
+    // family's separate testing URL -- backend keeps it out of Joseph's stay
+    // context and tags it distinctly, session_id itself already hard-isolates
+    // conversation history either way.
+    const experienceId = new URLSearchParams(location.search).get('experience');
+    const body = {session_id: sid, message};
+    if (experienceId) body.experience_id = experienceId;
     const res = await fetch(BERTHA_API + '/chat', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({session_id: sid, message})
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     berthaHideTyping();
