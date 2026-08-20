@@ -236,7 +236,7 @@
   <h3 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--text);">A quick note</h3>
   <p style="margin:0 0 0.6rem;"><strong>What this is:</strong> an informal local guide put together by your host, not an official safety authority. Hours, directions, and details are curated from what we could find and haven't been independently verified — always confirm anything time-sensitive or safety-related directly with the business.</p>
   <p style="margin:0 0 0.6rem;"><strong>Your privacy:</strong> browsing and searching the guide list happens right on your phone and isn't sent or tracked anywhere. If you chat with Bertha, the text of your question and her answer is sent to an AI service to generate a reply and logged for up to 60 days to help us improve her, then deleted — no name, phone, email, or reservation/property info is ever collected or stored. Rick is the named owner of this data; reach him directly with any question or concern.</p>
-  <p style="margin:0 0 0.7rem;"><strong>Bertha feedback, not a stay review:</strong> since you're helping us try out this early version of Bertha, we'd like to add a $50 credit to your current Airbnb stay as a thank-you. Use it however you'd like during the trip — Honi-Honi, dinner, an activity, or somewhere else Bertha helps you discover. There's absolutely no requirement to give positive feedback. What helps us most is simply hearing what worked, what was wrong, what was missing, or what would have made Bertha more useful. This is completely separate from your Airbnb review of the house/stay itself — please leave that on Airbnb as usual.</p>
+  <p id="feedback-intro-copy" style="margin:0 0 0.7rem;"><strong>Bertha feedback, not a stay review:</strong> since you're helping us try out this early version of Bertha, we'd like to add a $50 credit to your current Airbnb stay as a thank-you. Use it however you'd like during the trip — Honi-Honi, dinner, an activity, or somewhere else Bertha helps you discover. There's absolutely no requirement to give positive feedback. What helps us most is simply hearing what worked, what was wrong, what was missing, or what would have made Bertha more useful. This is completely separate from your Airbnb review of the house/stay itself — please leave that on Airbnb as usual.</p>
   <button id="feedback-open-btn" type="button" style="padding:0.6rem 1.1rem; border-radius:999px; border:none; background:linear-gradient(120deg, var(--accent), var(--accent2)); color:white; font-size:0.85rem; font-weight:600; cursor:pointer;">Give Bertha feedback</button>
 </div>
 
@@ -281,7 +281,7 @@
     </form>
     <div id="feedback-thanks" style="display:none; text-align:center; padding:1.2rem 0.4rem;">
       <p style="font-size:0.95rem; font-weight:600; margin:0 0 0.4rem;">Thanks — this goes directly to our Bertha beta review.</p>
-      <p style="font-size:0.82rem; color:var(--text-dim); margin:0;">Your $50 credit is on its way regardless of what you told us. Feel free to close this and keep chatting with Bertha.</p>
+      <p id="feedback-thanks-credit-line" style="font-size:0.82rem; color:var(--text-dim); margin:0;">Your $50 credit is on its way regardless of what you told us. Feel free to close this and keep chatting with Bertha.</p>
       <button id="feedback-done-btn" type="button" style="margin-top:1rem; padding:0.6rem 1.1rem; border-radius:999px; border:1px solid var(--border); background:white; color:var(--text); font-size:0.85rem; font-weight:600; cursor:pointer;">Close</button>
     </div>
   </div>
@@ -1121,6 +1121,18 @@ function fileToBase64(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// 2026-08-20, Rick's directive: the $50 credit is a real Airbnb-stay thank-you for
+// Joseph's real guest beta and must never be implied for Rick's own family testing
+// (fleitas_family_test), which isn't a real stay and isn't getting a credit --
+// scoped by the same experience_id already used for context/telemetry isolation
+// throughout tonight, copy-only, no change to Joseph's default experience.
+if (new URLSearchParams(location.search).get('experience') === 'fleitas_family_test') {
+  const intro = document.getElementById('feedback-intro-copy');
+  if (intro) intro.innerHTML = '<strong>Bertha feedback, not a stay review:</strong> we\'d love to hear what worked, what was wrong, what was missing, or what would have made Bertha more useful. This is completely separate from an Airbnb review of the house/stay itself.';
+  const creditLine = document.getElementById('feedback-thanks-credit-line');
+  if (creditLine) creditLine.textContent = 'Feel free to close this and keep chatting with Bertha.';
 }
 
 document.getElementById('feedback-open-btn').addEventListener('click', () => {
