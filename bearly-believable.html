@@ -930,7 +930,22 @@ const placeById = Object.fromEntries(data.ring1_places.map(p => [p.id, p]));
 // flipping approved:true makes it appear with zero code changes here.
 let BERTHA_ASSETS = null;
 let currentMode = 'bertha_default';
-fetch('bertha_assets.json').then(r => r.json()).then(m => { BERTHA_ASSETS = m; }).catch(() => {});
+// 2026-08-20 real gap found pre-guest-arrival: applyBerthaMode() was only
+// ever called reactively after a chat response's mode_id -- the header
+// avatar stayed the static placeholder emoji until a guest sent a first
+// message, even with an approved real image ready. Applies the default
+// mode once the manifest loads, so the real (now-approved) image shows
+// immediately on page load, not just after interaction.
+fetch('bertha_assets.json').then(r => r.json()).then(m => {
+  BERTHA_ASSETS = m;
+  // Deliberately NOT m.default_mode ('bertha_default', the unknown-intent
+  // fallback) -- that string equals currentMode's own initial value, so
+  // applyBerthaMode's own no-op guard (modeId === currentMode) would skip
+  // rendering entirely. 'bertha_default_lake' is the manifest's own
+  // documented welcome/generic-question mode (mode 01) and the actual
+  // Master-Bertha-Gate-approved image.
+  applyBerthaMode('bertha_default_lake', 'page_load');
+}).catch(() => {});
 
 function applyBerthaMode(modeId, source) {
   if (!modeId || modeId === currentMode || !BERTHA_ASSETS) return;
