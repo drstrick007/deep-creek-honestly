@@ -126,6 +126,23 @@
   .bertha-place-card { background: #f7f5f0; border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 0.9rem; margin: 0.4rem 0 0.7rem; font-size: 0.85rem; }
   .bertha-place-card h4 { margin: 0 0 0.25rem; font-size: 0.92rem; }
   .bertha-place-card .from-here { font-size: 0.74rem; color: var(--accent); font-weight: 600; margin-bottom: 0.3rem; }
+  .bertha-search-cards { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.4rem 0 0.7rem; }
+  .bertha-search-card { background: #f7f5f0; border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 0.9rem; font-size: 0.85rem; }
+  .bertha-search-card.is-pick { border-color: var(--accent); border-width: 1.5px; }
+  .bertha-search-card .pick-badge {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.02em;
+    color: #fff; background: var(--accent); border-radius: 999px; padding: 0.15rem 0.55rem; margin-bottom: 0.35rem;
+  }
+  .bertha-search-card h4 { margin: 0 0 0.2rem; font-size: 0.92rem; }
+  .bertha-search-card .meta-row { font-size: 0.76rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+  .bertha-search-card .why { font-size: 0.8rem; margin: 0.25rem 0; }
+  .bertha-search-card .address { font-size: 0.76rem; color: var(--text-dim); margin-bottom: 0.35rem; }
+  .bertha-search-card .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.35rem; }
+  .bertha-search-card .actions a {
+    font-size: 0.74rem; padding: 0.32rem 0.6rem; border-radius: 999px; text-decoration: none;
+    border: 1px solid var(--border); color: var(--text); background: white; font-weight: 600;
+  }
+  .bertha-search-card .actions a:hover { border-color: var(--accent); color: var(--accent); }
   .bertha-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .header-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 </style>
@@ -139,8 +156,8 @@
 
 <header>
   <div class="persona" id="header-avatar">🐻</div>
-  <h1>Hi, I'm Bertha! (Full name: Bearly Bertha)</h1>
-  <p>Your local guide for the stay at Bearly Believable</p>
+  <h1>Hi, I'm Bertha!</h1>
+  <p>Full name Bearly Bertha — your local guide for the stay at Bearly Believable</p>
 </header>
 
 <main>
@@ -772,6 +789,19 @@ function navLinks(lat, lng) {
   };
 }
 
+// Same deep-link schemes as navLinks() above, address-string form -- all
+// three providers accept a plain destination address, no geocoding needed.
+// Used for search_places (real businesses found via web search, no lat/lng
+// available -- see coa/bertha_chat.py's search_places field).
+function navLinksFromAddress(address) {
+  const q = encodeURIComponent(address);
+  return {
+    apple: `https://maps.apple.com/?daddr=${q}`,
+    google: `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=driving`,
+    waze: `https://www.waze.com/ul?q=${q}&navigate=yes`,
+  };
+}
+
 function navChooserHTML(place, sourceSurface) {
   if (!place.lat || !place.lng) return '';
   const links = navLinks(place.lat, place.lng);
@@ -973,6 +1003,50 @@ function berthaAppendPlaceCards(placeIds) {
   log.scrollTop = log.scrollHeight;
 }
 
+// Real live defect, Rick's own screenshot (2026-08-20): search-found
+// businesses (not in the curated guide) were rendered as one undifferentiated
+// prose paragraph with raw markdown leaking through -- no card separation,
+// no phone/action buttons, no distinguishing pick. Mirrors the existing
+// .card/renderCard visual pattern (name, badges, actions, directions) so
+// this reads consistently with the rest of the site, rather than inventing
+// a new visual language. No distance/drive-time shown here -- unlike
+// guide-data places (which have curated lat/lng), a search result only has
+// an address string; showing a real mile/minute figure would require a
+// geocoding + routing API call this project doesn't have wired up, and
+// fabricating one is not an option.
+function renderSearchPlaceCard(place) {
+  const addr = place.address ? place.address.replace(/"/g, '&quot;') : null;
+  const openBadgeHTML = place.open_now === true
+    ? `<span class="badge open">open now</span>`
+    : place.open_now === false
+      ? `<span class="badge closed">closed now</span>`
+      : `<span class="badge unknown">hours vary</span>`;
+  const nav = addr ? navLinksFromAddress(place.address) : null;
+  return `
+    <div class="bertha-search-card${place.recommended ? ' is-pick' : ''}">
+      ${place.recommended ? `<div class="pick-badge">Bertha's Pick</div>` : ''}
+      <h4>${place.name}</h4>
+      <div class="meta-row">${place.category}${place.category ? ' · ' : ''}${openBadgeHTML}${place.rating ? ' · ' + place.rating : ''}</div>
+      ${addr ? `<div class="address">${addr}</div>` : ''}
+      ${place.why ? `<p class="why">${place.why}</p>` : ''}
+      <div class="actions">
+        ${place.phone ? `<a href="tel:${place.phone}">Call</a>` : ''}
+        ${place.website ? `<a href="${place.website}" target="_blank" rel="noopener">Website</a>` : ''}
+        ${nav ? `<a href="${nav.apple}" target="_blank">Apple Maps</a><a href="${nav.google}" target="_blank">Google Maps</a><a href="${nav.waze}" target="_blank">Waze</a>` : ''}
+      </div>
+    </div>`;
+}
+
+function berthaAppendSearchPlaceCards(places) {
+  if (!places || !places.length) return;
+  const log = document.getElementById('bertha-log');
+  const wrap = document.createElement('div');
+  wrap.className = 'bertha-search-cards';
+  wrap.innerHTML = places.map(renderSearchPlaceCard).join('');
+  log.appendChild(wrap);
+  log.scrollTop = log.scrollHeight;
+}
+
 async function berthaAccept() {
   const sid = berthaSessionId();
   try {
@@ -1034,6 +1108,7 @@ async function berthaSend() {
     }
     berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''));
     if (data.place_ids && data.place_ids.length) berthaAppendPlaceCards(data.place_ids);
+    if (data.search_places && data.search_places.length) berthaAppendSearchPlaceCards(data.search_places);
     if (data.mode_id) applyBerthaMode(data.mode_id, 'user_question');
   } catch (e) {
     berthaHideTyping();
