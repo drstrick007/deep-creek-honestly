@@ -84,11 +84,28 @@
 
   .highlights { background: var(--accent-light); }
   .highlight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
-  .highlight-card { background: var(--card); border-radius: 14px; padding: 1.6rem; border: 1px solid var(--border); }
-  .highlight-card .icon { font-size: 1.6rem; margin-bottom: 0.7rem; }
+  .highlight-card { background: var(--card); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+  .highlight-card .card-body { padding: 1.6rem; }
+  .highlight-card.text-only .card-body { padding-top: 1.6rem; }
+  .highlight-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
   .highlight-card h3 { margin: 0 0 0.4rem; font-size: 1.02rem; }
   .highlight-card p { margin: 0; color: var(--ink-dim); font-size: 0.9rem; }
   @media (max-width: 760px) { .highlight-grid { grid-template-columns: 1fr; } }
+
+  .rules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 3rem; }
+  .rules-grid h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--accent-dark); }
+  .rules-grid p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; }
+  @media (max-width: 760px) { .rules-grid { grid-template-columns: 1fr; } }
+
+  .room-list { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+  .room-list span { background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 0.5rem 1.1rem; font-size: 0.88rem; color: var(--ink-dim); }
+
+  .telework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; }
+  .telework-card img { border-radius: 14px; margin-bottom: 1rem; box-shadow: 0 14px 35px -18px rgba(30,20,10,0.35); height: 220px; width: 100%; object-fit: cover; }
+  .telework-card h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+  .telework-card p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; }
+  .telework-card .bar-story { font-style: italic; }
+  @media (max-width: 820px) { .telework-grid { grid-template-columns: 1fr; } }
 
   .bertha-promo {
     display: flex; align-items: center; gap: 2.5rem; background: radial-gradient(circle at 15% 20%, #3a8a63, transparent 55%), linear-gradient(135deg, var(--accent-dark), var(--accent));
@@ -116,6 +133,7 @@
     <div class="nav-links">
       <a href="#about">The House</a>
       <a href="#gallery">Photos</a>
+      <a href="#house-rules">House Rules</a>
       <a href="#bertha">Ask Bertha</a>
     </div>
     <a class="nav-cta" href="https://www.airbnb.com/rooms/46583887" target="_blank" rel="noopener">Check Availability</a>
@@ -157,8 +175,8 @@
   <div class="bertha-promo">
     <div class="avatar"><img src="assets/brand/bertha-logo.png" alt="Bertha"></div>
     <div>
-      <h2>Meet Bertha</h2>
-      <p>Full name Bearly Bertha — an AI-assisted local guide for guests staying at the house — ask her about restaurants, hours, directions, and things to do around Deep Creek Lake and Garrett County. AI-drafted, not reviewed by a person before you see it — always worth verifying anything time-sensitive.</p>
+      <h2>Meet Bearly Bertha</h2>
+      <p>But now that you're our guest, Bertha's just fine. She's your AI-assisted local guide for the stay: ask her about restaurants, hours, directions, and things to do around Deep Creek Lake and Garrett County. AI-drafted, not reviewed by a person before you see it — always worth verifying anything time-sensitive.</p>
       <a class="btn btn-primary" href="bearly-believable.html">Talk to Bertha →</a>
     </div>
   </div>
@@ -186,12 +204,75 @@
     <h2>What guests use most</h2>
   </div>
   <div class="highlight-grid">
-    <div class="highlight-card"><div class="icon">🛁</div><h3>6-Person Hot Tub</h3><p>Outside on the lower deck, lit path down from the main level, open year-round.</p></div>
-    <div class="highlight-card"><div class="icon">🎱</div><h3>Game Room</h3><p>Pool table, dartboard, and a fireplace on the lower level — the rainy-day room.</p></div>
-    <div class="highlight-card"><div class="icon">🔥</div><h3>Fire Pit Deck</h3><p>Genuinely dark sky most nights — bring the marshmallows.</p></div>
-    <div class="highlight-card"><div class="icon">🐾</div><h3>Dog-Friendly</h3><p>Pet bowls and a designated spot already set up — bring the whole family.</p></div>
-    <div class="highlight-card"><div class="icon">🚗</div><h3>1 Min to the Lake</h3><p>5 minutes to Wisp Resort, 5 minutes to Deep Creek Lake State Park.</p></div>
-    <div class="highlight-card"><div class="icon">🏔️</div><h3>Wraparound Deck</h3><p>Mountain and lake views from the main living level.</p></div>
+    <div class="highlight-card"><img src="photos/patio-hot-tub-real.jpg" alt="Six-person hot tub on the covered stone patio"><div class="card-body"><h3>6-Person Hot Tub</h3><p>On the covered stone patio, lit path down from the main level, open year-round.</p></div></div>
+    <div class="highlight-card"><img src="photos/theme-room-pool-table.jpg" alt="Theme room with pool table"><div class="card-body"><h3>Game Room</h3><p>Pool table, dartboard, antique bar, and a fireplace on the lower level — the rainy-day room.</p></div></div>
+    <div class="highlight-card text-only"><div class="card-body"><h3>Fire Pit Deck</h3><p>Genuinely dark sky most nights — bring the marshmallows.</p></div></div>
+    <div class="highlight-card text-only"><div class="card-body"><h3>Dog-Friendly</h3><p>Pet bowls and a designated spot already set up — bring the whole family.</p></div></div>
+    <div class="highlight-card text-only"><div class="card-body"><h3>Close to Everything</h3><p>Steps from the lake, 5 minutes to Wisp Resort, 5 minutes to Deep Creek Lake State Park.</p></div></div>
+    <div class="highlight-card"><img src="photos/balcony-view-real.jpg" alt="Deck view toward the mountains and lake"><div class="card-body"><h3>Wraparound Deck</h3><p>Mountain and lake views from the main living level.</p></div></div>
+  </div>
+</section>
+
+<section id="house-rules">
+  <div class="section-head">
+    <div class="kicker">Before You Arrive</div>
+    <h2>House Rules &amp; More</h2>
+  </div>
+  <div class="rules-grid">
+    <div>
+      <h3>Pets</h3>
+      <p>Dog-friendly — $100 pet fee per dog per stay, 2-dog maximum. A collapsible crate and dog bowls are provided. Let your host know your dog's size/breed at booking for approval. The yard is fertilized, so please clean up after dogs.</p>
+    </div>
+    <div>
+      <h3>Smoking</h3>
+      <p>Strict no-smoking policy anywhere on the property. Evidence of smoking may result in substantial fees for outdoor cleanup and smell remediation.</p>
+    </div>
+    <div>
+      <h3>Winter Driving</h3>
+      <p>AWD or 4WD is strongly recommended during Wisp's winter season.</p>
+    </div>
+    <div>
+      <h3>Indoor Fireplaces</h3>
+      <p>Real, working fireplaces — a current amenity, not just for show.</p>
+    </div>
+    <div>
+      <h3>Garage</h3>
+      <p>The garage is not available for guest use.</p>
+    </div>
+  </div>
+</section>
+
+<section id="rooms">
+  <div class="section-head">
+    <div class="kicker">The Layout</div>
+    <h2>Room by room</h2>
+    <p>Five bedrooms, three full bathrooms, and a house built for a full group to actually spread out.</p>
+  </div>
+  <div class="room-list">
+    <span>Exterior</span><span>Living Room</span><span>Patio (Hot Tub)</span><span>Dining Area</span>
+    <span>Full Kitchen</span><span>Theme Room (Bar, Pool Table, Darts, TV)</span>
+    <span>Bedroom 1 — Primary Suite</span><span>Full Bathroom 1 (Jacuzzi Tub)</span>
+    <span>Bedroom 2</span><span>Bedroom 3 (Desk + Workspace)</span><span>Bedroom 4</span>
+    <span>Bedroom 5 (Bunk Beds)</span><span>Full Bathroom 3</span><span>Balcony</span><span>Laundry Area</span>
+  </div>
+</section>
+
+<section id="telework">
+  <div class="section-head">
+    <div class="kicker">Work From Here</div>
+    <h2>Where the games — and the work — happen</h2>
+  </div>
+  <div class="telework-grid">
+    <div class="telework-card">
+      <img src="photos/theme-room-antique-bar.jpg" alt="Antique bar in the Theme room">
+      <h3>The Antique Bar</h3>
+      <p class="bar-story">"This was part of the bar on a steamboat from New Orleans to Baltimore Harbor in 1910. An antique dealer in Amish Country in Eastern Maryland obtained and cut the U-shape bar into 2 Ls. One of which we can now share with you at Bearly Believable."</p>
+    </div>
+    <div class="telework-card">
+      <img src="photos/theme-room-pool-table.jpg" alt="Theme room, downstairs">
+      <h3>Two Good Spots to Get Work Done</h3>
+      <p>Bedroom 3 has a real desk and printer — the quiet option upstairs. Downstairs, the Theme room (pool table, dartboard, indoor fireplace, TV, and the antique bar above) is where the group ends up most nights — pool table, dartboard, and a fireplace, right where the group actually gathers.</p>
+    </div>
   </div>
 </section>
 
