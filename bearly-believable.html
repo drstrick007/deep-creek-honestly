@@ -143,6 +143,18 @@
     border: 1px solid var(--border); color: var(--text); background: white; font-weight: 600;
   }
   .bertha-search-card .actions a:hover { border-color: var(--accent); color: var(--accent); }
+  .bertha-event-cards { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.4rem 0 0.7rem; }
+  .bertha-event-card { background: #f7f5f0; border: 1px solid var(--border); border-left: 3px solid var(--accent2); border-radius: 12px; padding: 0.75rem 0.9rem; font-size: 0.85rem; }
+  .bertha-event-card .when { font-size: 0.76rem; font-weight: 700; color: var(--accent); margin-bottom: 0.2rem; letter-spacing: 0.01em; }
+  .bertha-event-card h4 { margin: 0 0 0.2rem; font-size: 0.92rem; }
+  .bertha-event-card .venue { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.3rem; }
+  .bertha-event-card .unconfirmed { font-size: 0.72rem; color: #b3452c; margin-bottom: 0.3rem; }
+  .bertha-event-card .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.35rem; }
+  .bertha-event-card .actions a {
+    font-size: 0.74rem; padding: 0.32rem 0.6rem; border-radius: 999px; text-decoration: none;
+    border: 1px solid var(--border); color: var(--text); background: white; font-weight: 600;
+  }
+  .bertha-event-card .actions a:hover { border-color: var(--accent); color: var(--accent); }
   .bertha-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .header-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 </style>
@@ -1227,6 +1239,54 @@ function berthaAppendSearchPlaceCards(places) {
   log.scrollTop = log.scrollHeight;
 }
 
+// 2026-08-20, Directive 3 (Consistent Action UX): confirmed via a real live test
+// that /chat already returns a fully verified, deterministically temporal-filtered
+// "events" array (event_name/venue/date/source/confidence -- see coa/bertha_chat.py's
+// _filter_events_by_temporal_window) but the frontend never rendered it as anything --
+// event answers fell back to prose-only while place/business answers got full cards
+// with actions. Same root cause the voice-layer prompt already assumes is fixed
+// ("the rest still show up as their own cards below your text") -- this makes that
+// true for events, not just places. No lat/lng/phone for events (not applicable),
+// so this mirrors renderSearchPlaceCard's shape rather than the guide-place card.
+function formatEventWhen(startIso) {
+  if (!startIso) return null;
+  const m = startIso.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!m) return startIso;
+  const [, y, mo, d, h, mi] = m.map(Number);
+  const dow = new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const timeStr = (h === 0 && mi === 0) ? '' : ` · ${hour12}:${String(mi).padStart(2, '0')} ${ampm}`;
+  return `${days[dow]}, ${months[mo - 1]} ${d}${timeStr}`;
+}
+
+function renderEventCard(ev) {
+  const when = formatEventWhen(ev.event_start_datetime);
+  const lowConfidence = ev.confidence !== 'high';
+  return `
+    <div class="bertha-event-card">
+      ${when ? `<div class="when">${when}</div>` : ''}
+      <h4>${ev.event_name}</h4>
+      ${ev.venue ? `<div class="venue">${ev.venue}</div>` : ''}
+      ${lowConfidence ? `<div class="unconfirmed">not fully confirmed — verify directly</div>` : ''}
+      <div class="actions">
+        ${ev.source_url ? `<a href="${ev.source_url}" target="_blank" rel="noopener">Source</a>` : ''}
+      </div>
+    </div>`;
+}
+
+function berthaAppendEventCards(events) {
+  if (!events || !events.length) return;
+  const log = document.getElementById('bertha-log');
+  const wrap = document.createElement('div');
+  wrap.className = 'bertha-event-cards';
+  wrap.innerHTML = events.map(renderEventCard).join('');
+  log.appendChild(wrap);
+  log.scrollTop = log.scrollHeight;
+}
+
 async function berthaAccept() {
   const sid = berthaSessionId();
   try {
@@ -1298,6 +1358,7 @@ async function berthaSend() {
     berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''));
     if (data.place_ids && data.place_ids.length) berthaAppendPlaceCards(data.place_ids);
     if (data.search_places && data.search_places.length) berthaAppendSearchPlaceCards(data.search_places);
+    if (data.events && data.events.length) berthaAppendEventCards(data.events);
     if (data.mode_id) applyBerthaMode(data.mode_id, 'user_question');
   } catch (e) {
     berthaHideTyping();
