@@ -947,9 +947,29 @@ fetch('bertha_assets.json').then(r => r.json()).then(m => {
   applyBerthaMode('bertha_default_lake', 'page_load');
 }).catch(() => {});
 
+// Real live bug, found via Rick's own screenshots 34s apart (2026-08-20):
+// correct real image on page load, reverted to the plain emoji on BOTH
+// avatars the moment a chat response applied mode_id "bertha_default" (the
+// low-confidence/unmatched-query fallback mode, distinct from mode 01) --
+// that mode has never been approved, so the existing approved-check
+// correctly fell through to its own placeholder emoji, undoing a real
+// image the guest was already looking at. The manifest's own
+// fallback_asset field was defined for exactly this chaining case but was
+// never actually read by any code -- wired in now, bounded to a few hops
+// so a bad manifest can never loop forever.
+function _resolveApprovedMode(modeId) {
+  let mode = BERTHA_ASSETS.modes.find(m => m.mode_id === modeId) || BERTHA_ASSETS.modes.find(m => m.mode_id === 'bertha_default');
+  for (let hops = 0; hops < 4 && mode && !mode.approved && mode.fallback_asset; hops++) {
+    const next = BERTHA_ASSETS.modes.find(m => m.mode_id === mode.fallback_asset);
+    if (!next) break;
+    mode = next;
+  }
+  return mode;
+}
+
 function applyBerthaMode(modeId, source) {
   if (!modeId || modeId === currentMode || !BERTHA_ASSETS) return;
-  const mode = BERTHA_ASSETS.modes.find(m => m.mode_id === modeId) || BERTHA_ASSETS.modes.find(m => m.mode_id === 'bertha_default');
+  const mode = _resolveApprovedMode(modeId);
   currentMode = modeId;
   [['header-avatar', false], ['chat-avatar', true]].forEach(([elId, small]) => {
     const el = document.getElementById(elId);
