@@ -98,6 +98,24 @@
   .bertha-msg.user .bubble { background: linear-gradient(120deg, var(--accent), var(--accent2)); color: white; border-bottom-right-radius: 4px; }
   .bertha-msg.bear .bubble { background: #f0ede6; color: var(--text); border-bottom-left-radius: 4px; }
   .bertha-msg .cat { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.25rem; }
+  /* 2026-08-20, Rick's real mobile bug: the only Bertha visual/state cue lived in the
+     sticky header, which scrolls out of view the moment a conversation gets going --
+     guests never look back up there, so a mode/persona change was invisible. Anchors
+     identity to the message area itself instead, so it travels down the page with
+     every reply and survives cards pushing the conversation downward. */
+  .bertha-msg.bear { display: flex; align-items: flex-start; gap: 0.5rem; }
+  .bertha-msg.bear .msg-avatar {
+    width: 1.9rem; height: 1.9rem; border-radius: 50%; background: #f0ede6; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.05rem; overflow: hidden;
+    box-shadow: 0 0 0 1px var(--border); margin-top: 0.15rem;
+  }
+  .bertha-msg.bear .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .bertha-msg.bear .msg-body { flex: 1; min-width: 0; }
+  .bertha-msg.bear .mode-label {
+    display: inline-block; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em;
+    color: var(--accent); background: var(--accent-dim); border-radius: 999px;
+    padding: 0.12rem 0.55rem; margin-bottom: 0.3rem;
+  }
   .typing-dots { display: inline-flex; gap: 0.28rem; padding: 0.7rem 1rem; background: #f0ede6; border-radius: 16px; border-bottom-left-radius: 4px; }
   .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #9a9285; animation: bounce 1.2s infinite ease-in-out; }
   .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
@@ -1027,6 +1045,26 @@ function _resolveApprovedMode(modeId) {
   return mode;
 }
 
+// 2026-08-20: per-message identity cue (see .bertha-msg.bear .msg-avatar CSS above)
+// -- reuses the exact same approved/fallback resolution as the header avatar so the
+// two never disagree, but is looked up independently per-message rather than reading
+// the shared `currentMode` global, so it's correct even for out-of-order responses.
+function berthaMsgAvatarHTML(modeId) {
+  if (!BERTHA_ASSETS) return '🐻';
+  const mode = _resolveApprovedMode(modeId || currentMode);
+  if (!mode) return '🐻';
+  if (mode.approved) {
+    return `<img src="${BERTHA_ASSETS.asset_dir}${mode.filename}" alt="${mode.alt_text}" onerror="this.parentElement.textContent='${mode.placeholder_emoji}'">`;
+  }
+  return mode.placeholder_emoji;
+}
+
+function berthaModeLabel(modeId) {
+  if (!modeId || modeId === 'bertha_default' || modeId === 'bertha_default_lake') return 'Bertha';
+  const words = modeId.replace(/^bertha_/, '').replace(/_/g, ' ');
+  return 'Bertha · ' + words.replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function applyBerthaMode(modeId, source) {
   if (!modeId || modeId === currentMode || !BERTHA_ASSETS) return;
   const mode = _resolveApprovedMode(modeId);
@@ -1166,11 +1204,21 @@ function berthaShowChatUI() {
   document.getElementById('bertha-input-row').style.display = 'flex';
 }
 
-function berthaAppendMsg(role, text, cat) {
+function berthaAppendMsg(role, text, cat, modeId) {
   const log = document.getElementById('bertha-log');
   const div = document.createElement('div');
   div.className = 'bertha-msg ' + role;
-  div.innerHTML = `<div class="bubble"></div>` + (cat ? `<div class="cat">${cat}</div>` : '');
+  if (role === 'bear') {
+    div.innerHTML = `
+      <div class="msg-avatar">${berthaMsgAvatarHTML(modeId)}</div>
+      <div class="msg-body">
+        <div class="mode-label">${berthaModeLabel(modeId)}</div>
+        <div class="bubble"></div>
+        ${cat ? `<div class="cat">${cat}</div>` : ''}
+      </div>`;
+  } else {
+    div.innerHTML = `<div class="bubble"></div>` + (cat ? `<div class="cat">${cat}</div>` : '');
+  }
   div.querySelector('.bubble').textContent = text;
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
@@ -1355,7 +1403,7 @@ async function berthaSend() {
       berthaAppendMsg('bear', "I'm having trouble right now — try the search below instead.");
       return;
     }
-    berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''));
+    berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''), data.mode_id);
     if (data.place_ids && data.place_ids.length) berthaAppendPlaceCards(data.place_ids);
     if (data.search_places && data.search_places.length) berthaAppendSearchPlaceCards(data.search_places);
     if (data.events && data.events.length) berthaAppendEventCards(data.events);
