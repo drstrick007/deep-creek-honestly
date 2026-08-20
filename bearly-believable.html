@@ -1008,6 +1008,7 @@ const placeById = Object.fromEntries(data.ring1_places.map(p => [p.id, p]));
 // flipping approved:true makes it appear with zero code changes here.
 let BERTHA_ASSETS = null;
 let currentMode = 'bertha_default';
+let lastLabeledMode = null;
 // 2026-08-20 real gap found pre-guest-arrival: applyBerthaMode() was only
 // ever called reactively after a chat response's mode_id -- the header
 // avatar stayed the static placeholder emoji until a guest sent a first
@@ -1231,10 +1232,21 @@ function berthaAppendMsg(role, text, cat, modeId) {
   const div = document.createElement('div');
   div.className = 'bertha-msg ' + role;
   if (role === 'bear') {
+    // 2026-08-20, Rick's own acceptance criteria: "no duplicate clutter if multiple
+    // consecutive Bertha replies occur without a meaningful state change." The
+    // avatar image stays on every reply (that's what guarantees the guest can always
+    // see Bertha's current visual without scrolling up), but the text label only
+    // reappears when the resolved mode actually differs from the last one shown --
+    // resolved, not raw, so two raw mode_ids that fall back to the same approved
+    // asset don't count as a "change" either.
+    const resolved = BERTHA_ASSETS ? _resolveApprovedMode(modeId || currentMode) : null;
+    const resolvedId = resolved ? resolved.mode_id : (modeId || currentMode);
+    const showLabel = resolvedId !== lastLabeledMode;
+    lastLabeledMode = resolvedId;
     div.innerHTML = `
       <div class="msg-avatar">${berthaMsgAvatarHTML(modeId)}</div>
       <div class="msg-body">
-        <div class="mode-label">${berthaModeLabel(modeId)}</div>
+        ${showLabel ? `<div class="mode-label">${berthaModeLabel(modeId)}</div>` : ''}
         <div class="bubble"></div>
         ${cat ? `<div class="cat">${cat}</div>` : ''}
       </div>`;
