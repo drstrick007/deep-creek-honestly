@@ -113,6 +113,32 @@
   }
   .bertha-log-sticky .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
   .bertha-log-sticky .label { font-size: 0.72rem; font-weight: 700; color: var(--accent); }
+  /* 2026-08-21 — REPRODUCED failure, then fixed. The in-log sticky bar above survives
+     scrolling INSIDE .bertha-log, but `position: sticky` only sticks within its own
+     scroll container: when the OUTER PAGE scrolls, the whole .bertha-log rides off the
+     top of the viewport, sticky bar included (measured: log top -497px, sticky -483px,
+     both off-screen). That is exactly the reported "Bertha not visible unless the user
+     scrolls away from the chat." Making .bertha-head sticky instead was tested and also
+     fails (-671px) because .bertha-box has `overflow: hidden`, which clips sticky
+     descendants. Restructuring .bertha-box was out of scope, so the cue is anchored to
+     the VIEWPORT here — the only frame that survives both scroll axes. It auto-hides
+     whenever a real in-box avatar is already on screen, so it never double-shows. */
+  .bertha-float {
+    position: fixed; left: 50%; transform: translateX(-50%) translateY(-0.4rem);
+    z-index: 25; display: flex; align-items: center; gap: 0.45rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.35rem; border-radius: 999px;
+    background: var(--card-bg); border: 1px solid var(--border);
+    box-shadow: 0 8px 22px -8px rgba(20,20,15,0.35);
+    opacity: 0; pointer-events: none; transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .bertha-float.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .bertha-float .avatar-sm {
+    width: 1.55rem; height: 1.55rem; border-radius: 50%; overflow: hidden; background: #f0ede6;
+    display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;
+  }
+  .bertha-float .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+  .bertha-float .label { font-size: 0.7rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { .bertha-float { transition: none; } }
   .bertha-msg { margin: 0.6rem 0; font-size: 0.9rem; line-height: 1.5; animation: msg-in 0.25s ease; }
   @keyframes msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .bertha-msg.user { text-align: right; }
@@ -236,6 +262,8 @@
       <button id="bertha-send">Send</button>
     </div>
   </div>
+
+  <div class="bertha-float" id="bertha-float" aria-hidden="true"><span class="avatar-sm" id="bertha-float-avatar">🐻</span><span class="label" id="bertha-float-label">Bertha</span></div>
 
   <div class="fallback-toggle" id="fallback-toggle">or browse / search the guide yourself ▾</div>
 
@@ -1046,6 +1074,7 @@ fetch('bertha_assets.json').then(r => r.json()).then(m => {
   // documented welcome/generic-question mode (mode 01) and the actual
   // Master-Bertha-Gate-approved image.
   applyBerthaMode('bertha_default_lake', 'page_load');
+  berthaInitFloat();
 }).catch(() => {});
 
 // Real live bug, found via Rick's own screenshots 34s apart (2026-08-20):
@@ -1126,7 +1155,56 @@ function applyBerthaMode(modeId, source) {
     }
     stickyLabel.textContent = berthaModeLabel(modeId);
   }
+  const floatAvatar = document.getElementById('bertha-float-avatar');
+  const floatLabel = document.getElementById('bertha-float-label');
+  if (floatAvatar && floatLabel) {
+    if (mode.approved) {
+      floatAvatar.innerHTML = `<img src="${BERTHA_ASSETS.asset_dir}${mode.filename}" alt="${mode.alt_text}" onerror="this.parentElement.textContent='${mode.placeholder_emoji}'">`;
+    } else {
+      floatAvatar.textContent = mode.placeholder_emoji;
+    }
+    floatLabel.textContent = berthaModeLabel(modeId);
+  }
   logVisualEvent('bertha_visual_shown', modeId, source);
+}
+
+// Viewport-anchored fallback cue (see .bertha-float CSS). Shows ONLY when the chat
+// box is on screen but no real in-box avatar is — so Bertha is always visible during
+// use, without ever double-showing next to the avatar the guest can already see.
+function berthaInitFloat() {
+  const float = document.getElementById('bertha-float');
+  const box = document.querySelector('.bertha-box');
+  const topnav = document.querySelector('.topnav');
+  if (!float || !box) return;
+
+  function position() {
+    const navH = topnav ? topnav.getBoundingClientRect().height : 0;
+    float.style.top = (navH + 8) + 'px';
+  }
+
+  function update() {
+    const vh = window.innerHeight;
+    const b = box.getBoundingClientRect();
+    // Only relevant while the guest is actually at the chat.
+    const boxOnScreen = b.bottom > 0 && b.top < vh;
+    // Is any real in-box avatar already visible? If so, stay hidden.
+    const anchors = ['chat-avatar', 'bertha-log-sticky'].map(id => document.getElementById(id));
+    const anchorVisible = anchors.some(el => {
+      if (!el || !el.offsetParent) return false;
+      const r = el.getBoundingClientRect();
+      return r.height > 0 && r.bottom > 0 && r.top < vh;
+    });
+    const show = boxOnScreen && !anchorVisible;
+    float.classList.toggle('is-visible', show);
+    float.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+
+  position();
+  update();
+  window.addEventListener('scroll', update, {passive: true});
+  window.addEventListener('resize', () => { position(); update(); }, {passive: true});
+  const log = document.getElementById('bertha-log');
+  if (log) log.addEventListener('scroll', update, {passive: true});
 }
 
 function logVisualEvent(event, modeId, source) {
