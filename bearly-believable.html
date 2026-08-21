@@ -91,6 +91,28 @@
   }
   .bertha-gate button:hover { transform: translateY(-1px); }
   .bertha-log { padding: 0.9rem 1.1rem; max-height: 52vh; overflow-y: auto; display: none; scroll-behavior: smooth; }
+  /* 2026-08-20, real mobile bug from Rick's own screenshot: scrolled deep into a
+     turn's result cards, the per-message avatar (attached to the text above)
+     scrolls out of view -- confirmed structurally (and by an independent model
+     critique, run before implementing) that a static image placed BELOW the whole
+     chat box wouldn't fix this either, since it lives outside .bertha-log's own
+     scroll area and would show a fixed image unrelated to whatever's actually
+     scrolled into view. This bar is a CHILD of .bertha-log itself and sticky to
+     ITS scroll, not the page's, so it survives scrolling through any number of
+     cards. Negative margins bleed it to the log's own edges (matching its padding)
+     so it reads as a real header strip, not an inset card. */
+  .bertha-log-sticky {
+    position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 0.5rem;
+    margin: -0.9rem -1.1rem 0.6rem; padding: 0.5rem 1.1rem; background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .bertha-log-sticky .avatar-sm {
+    width: 1.7rem; height: 1.7rem; border-radius: 50%; overflow: hidden; background: #f0ede6;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .bertha-log-sticky .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+  .bertha-log-sticky .label { font-size: 0.72rem; font-weight: 700; color: var(--accent); }
   .bertha-msg { margin: 0.6rem 0; font-size: 0.9rem; line-height: 1.5; animation: msg-in 0.25s ease; }
   @keyframes msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .bertha-msg.user { text-align: right; }
@@ -208,7 +230,7 @@
     <div class="bertha-fallback-note" id="bertha-fallback-note">
       Bertha's chat isn't reachable right now — use the search/browse below instead. She's just resting, not gone.
     </div>
-    <div class="bertha-log" id="bertha-log"></div>
+    <div class="bertha-log" id="bertha-log"><div class="bertha-log-sticky" id="bertha-log-sticky"><span class="avatar-sm" id="bertha-log-sticky-avatar">🐻</span><span class="label" id="bertha-log-sticky-label">Bertha</span></div></div>
     <div class="bertha-input-row" id="bertha-input-row">
       <input type="text" id="bertha-input" placeholder="Ask about restaurants, activities, hours, directions...">
       <button id="bertha-send">Send</button>
@@ -1089,6 +1111,21 @@ function applyBerthaMode(modeId, source) {
       el.textContent = mode.placeholder_emoji;
     }
   });
+  // Sticky bar lives INSIDE .bertha-log (see its CSS/HTML) so it stays visible
+  // while scrolling through however many result cards a turn produced -- unlike
+  // chat-avatar/header-avatar above, this one updates on every mode change
+  // regardless of source, since its whole purpose is being the always-visible
+  // "what's Bertha's current state" cue during active scrolling.
+  const stickyAvatar = document.getElementById('bertha-log-sticky-avatar');
+  const stickyLabel = document.getElementById('bertha-log-sticky-label');
+  if (stickyAvatar && stickyLabel) {
+    if (mode.approved) {
+      stickyAvatar.innerHTML = `<img src="${BERTHA_ASSETS.asset_dir}${mode.filename}" alt="${mode.alt_text}" onerror="this.parentElement.textContent='${mode.placeholder_emoji}'">`;
+    } else {
+      stickyAvatar.textContent = mode.placeholder_emoji;
+    }
+    stickyLabel.textContent = berthaModeLabel(modeId);
+  }
   logVisualEvent('bertha_visual_shown', modeId, source);
 }
 
