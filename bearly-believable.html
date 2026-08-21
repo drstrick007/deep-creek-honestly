@@ -1207,6 +1207,26 @@ document.getElementById('feedback-form').addEventListener('submit', async (e) =>
     const data = await res.json();
     if (!res.ok || !data.ok) throw new Error(data.error || 'submit failed');
 
+    // 2026-08-20, Rick's directive, checked fresh on every real submission rather
+    // than only once at page load (belt-and-suspenders against any stale-page
+    // scenario, and this is also where the once-only Joseph behavior has to live):
+    // family (fleitas_family_test) NEVER sees $50/credit language, full stop. For
+    // Joseph, the $50 is a one-time thank-you for participating, not per-submission
+    // compensation -- mentioning it after every single piece of feedback risks
+    // reframing genuine participation into paid microtasks. Shown once on his first
+    // real submission, remembered via localStorage, neutral on every one after that.
+    const creditLine = document.getElementById('feedback-thanks-credit-line');
+    if (creditLine) {
+      const isFamily = experienceId === 'fleitas_family_test';
+      const alreadyAcknowledged = localStorage.getItem('bertha_beta_credit_acknowledged') === 'true';
+      if (isFamily || alreadyAcknowledged) {
+        creditLine.textContent = 'Feel free to close this and keep chatting with Bertha.';
+      } else {
+        creditLine.textContent = 'Your $50 credit is on its way regardless of what you told us. Feel free to close this and keep chatting with Bertha.';
+        localStorage.setItem('bertha_beta_credit_acknowledged', 'true');
+      }
+    }
+
     document.getElementById('feedback-form').style.display = 'none';
     document.getElementById('feedback-thanks').style.display = 'block';
     document.getElementById('feedback-form').reset();
