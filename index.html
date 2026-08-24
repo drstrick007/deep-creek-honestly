@@ -10,8 +10,8 @@
 <meta property="og:site_name" content="Bearly Believable">
 <meta property="og:title" content="Bearly Believable — Deep Creek Lake">
 <meta property="og:description" content="A 5-bedroom chalet near Deep Creek Lake, five minutes from Wisp. Hot tub, game room with an antique bar, dark skies, and room for a whole group to spread out.">
-<meta property="og:image" content="https://drstrick007.github.io/deep-creek-honestly/photos/night-snow-exterior.jpg">
-<meta property="og:image:alt" content="Bearly Believable lit up at night in deep snow">
+<meta property="og:image" content="https://drstrick007.github.io/deep-creek-honestly/photos/hero-chalet-night.jpg">
+<meta property="og:image:alt" content="Bearly Believable at night in deep snow, gable windows glowing gold">
 <meta property="og:url" content="https://drstrick007.github.io/deep-creek-honestly/index.html">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -22,7 +22,7 @@
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.5; }
+  body { margin: 0; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.5; }
   img { max-width: 100%; display: block; }
   a { color: inherit; }
 
@@ -158,13 +158,22 @@
 
   footer { border-top: 1px solid var(--border); padding: 3rem 1.25rem; text-align: center; color: var(--ink-dim); font-size: 0.85rem; }
   footer .brand { justify-content: center; margin-bottom: 0.6rem; color: var(--ink); }
+  .disclose-block{max-width:1100px;margin:0 auto;padding:0 1.25rem}
+  .disclose-block summary{cursor:pointer;font-weight:700;color:var(--accent-dark);
+    padding:.85rem 1.1rem;background:var(--accent-light);border:1px solid var(--border);
+    border-radius:999px;display:inline-block;list-style:none;min-height:44px;line-height:1.6;
+    font-size:.94rem;user-select:none}
+  .disclose-block summary::-webkit-details-marker{display:none}
+  .disclose-block summary::after{content:" ▾";font-size:.8em}
+  .disclose-block[open] summary::after{content:" ▴"}
+  .disclose-block[open] summary{margin-bottom:1.25rem}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="#" class="brand"><img class="bear-logo" src="assets/brand/bertha-logo.png" alt=""> Bearly Believable</a>
+    <a href="#" class="brand"><img class="bear-logo" src="assets/brand/bertha-logo.png" alt="" loading="lazy" decoding="async"> Bearly Believable</a>
     <div class="nav-links">
       <a href="#about">The House</a>
       <a href="#rooms">Rooms</a>
@@ -177,7 +186,7 @@
 </nav>
 
 <div class="hero">
-  <img class="hero-img" src="photos/night-snow-exterior.jpg" alt="Bearly Believable lit up at night in deep snow, the tall gable windows glowing gold">
+  <img class="hero-img" fetchpriority="high" decoding="async" src="photos/hero-chalet-night.jpg" alt="Bearly Believable at night in deep snow, the tall A-frame gable windows glowing gold above the wraparound deck">
   <div class="hero-overlay">
     <div class="kicker">Deep Creek Lake · McHenry, Maryland</div>
     <h1>Bearly Believable</h1>
@@ -191,7 +200,7 @@
 
 <section id="about">
   <div class="about-grid">
-    <img src="photos/night-exterior-wide.jpg" alt="Bearly Believable exterior at night, string lights strung from the deck out to the trees">
+    <img src="photos/dining-great-room.jpg" alt="Open living and dining area, long table with seating for eight, sofas, and sliding doors onto the deck" loading="lazy" decoding="async">
     <div class="about-copy">
       <div class="kicker" style="color:var(--gold);font-weight:700;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.6rem;">The House</div>
       <h2 style="margin:0 0 1rem;font-size:1.8rem;">Space to spread out, close to everything</h2>
@@ -214,7 +223,7 @@
 
 <section id="bertha" style="padding-top:0;">
   <div class="bertha-promo">
-    <div class="avatar"><img src="assets/brand/bertha-logo.png" alt=""></div>
+    <div class="avatar"><img src="assets/brand/bertha-logo.png" alt="" loading="lazy" decoding="async"></div>
     <div>
       <h2>Meet Bearly Bertha</h2>
       <p>Bertha is the house's AI guide. Ask her what the place is actually like, what there is to do around Deep Creek Lake and Garrett County, or what the drive to Wisp is in February. She is most useful once you are staying here — she knows the house, the hours and what is on this weekend — but you are welcome to try her before you book. AI-drafted and not reviewed by a person before you see it, so worth double-checking anything time-sensitive.</p>
@@ -229,12 +238,14 @@
     <h2>See it for yourself</h2>
   </div>
   <div class="gallery">
-    <a href="photos/autumn-jeep-driveway.jpg" target="_blank" class="wide tall"><img src="photos/autumn-jeep-driveway.jpg" alt="Bearly Believable at dusk in autumn, driveway and fall foliage"></a>
-    <a href="photos/sunset-snowy-trees.jpg" target="_blank"><img src="photos/sunset-snowy-trees.jpg" alt="Game room with the pool table racked, cues on the wall, and a small stove in the corner"></a>
-    <a href="photos/bb-sign.jpg" target="_blank"><img src="photos/bb-sign.jpg" alt="Cozy lounge, dog-friendly"></a>
-    <a href="photos/firepit-mountain-view.jpg" target="_blank"><img src="photos/firepit-mountain-view.jpg" alt="Bunk-bed bedroom"></a>
-    <a href="photos/living-room-cozy.jpg" target="_blank" class="wide"><img src="photos/living-room-cozy.jpg" alt="Living room"></a>
-    <a href="photos/starry-sky.jpg" target="_blank"><img src="photos/starry-sky.jpg" alt="Night sky from the property"></a>
+    <a href="photos/autumn-jeep-driveway.jpg" target="_blank" class="wide tall"><img src="photos/autumn-jeep-driveway.jpg" alt="Bearly Believable at dusk in autumn, driveway and fall foliage" loading="lazy" decoding="async"></a>
+    <a href="photos/game-room-pool-cues.jpg" target="_blank"><img src="photos/game-room-pool-cues.jpg" alt="Game room with the pool table racked, cues on the wall, and a small stove in the corner" loading="lazy" decoding="async"></a>
+    <a href="photos/lower-lounge-dog.jpg" target="_blank"><img src="photos/lower-lounge-dog.jpg" alt="Cozy lounge, dog-friendly" loading="lazy" decoding="async"></a>
+    <a href="photos/bunk-room-wide.jpg" target="_blank"><img src="photos/bunk-room-wide.jpg" alt="Bunk-bed bedroom" loading="lazy" decoding="async"></a>
+    <a href="photos/living-room-cozy.jpg" target="_blank" class="wide"><img src="photos/living-room-cozy.jpg" alt="Living room" loading="lazy" decoding="async"></a>
+    <a href="photos/patio-hot-tub-real.jpg" target="_blank"><img src="photos/patio-hot-tub-real.jpg" alt="The six-person hot tub on the gravel patio under the deck, stepping stones leading to it through the trees" loading="lazy" decoding="async"></a>
+    <a href="photos/great-room-fireplace.jpg" target="_blank"><img src="photos/great-room-fireplace.jpg" alt="Main living room with a floor-to-ceiling stone fireplace, sofas and snow outside the windows" loading="lazy" decoding="async"></a>
+    <a href="photos/starry-sky.jpg" target="_blank"><img src="photos/starry-sky.jpg" alt="Night sky from the property" loading="lazy" decoding="async"></a>
   </div>
 </section>
 
@@ -244,83 +255,13 @@
     <h2>What guests use most</h2>
   </div>
   <div class="highlight-grid">
-    <div class="highlight-card"><img src="photos/patio-string-lights-night.jpg" alt="Covered stone patio at night, string lights overhead and a lit stepping-stone path leading to the hot tub"><div class="card-body"><h3>6-Person Hot Tub</h3><p>On the covered stone patio, string lights and a lit path down from the main level, open year-round.</p></div></div>
-    <div class="highlight-card"><img src="photos/theme-room-pool-table.jpg" alt="Theme room with pool table"><div class="card-body"><h3>Game Room</h3><p>Pool table, dartboard, antique bar, and a fireplace on the lower level — the rainy-day room.</p></div></div>
-    <div class="highlight-card text-only"><div class="card-body"><h3>Fire Nights, Real Sky</h3><p>A real wood-burning fire pit out back, chairs included — genuinely dark sky most nights, bring the marshmallows. A new gas fire feature is on the way for the patio, fitted for an always-on line.</p></div></div>
+    <div class="highlight-card"><img src="photos/patio-string-lights-night.jpg" alt="Covered stone patio at night, string lights overhead and a lit stepping-stone path leading to the hot tub" loading="lazy" decoding="async"><div class="card-body"><h3>6-Person Hot Tub</h3><p>Under the deck on the stone patio, at the end of a lit stepping-stone path down from the main level. Open year-round.</p></div></div>
+    <div class="highlight-card"><img src="photos/game-room-pool-cues.jpg" alt="Game room with the pool table racked, cues on the wall and a stove in the corner" loading="lazy" decoding="async"><div class="card-body"><h3>Game Room</h3><p>Pool table, dartboard, antique bar, and a fireplace on the lower level — the rainy-day room.</p></div></div>
+    <div class="highlight-card"><img src="photos/deck-fire-table-night.jpg" alt="Gas fire table lit on the deck at night, log chairs beside it and the lights of the bridge in the valley below" loading="lazy" decoding="async"><div class="card-body"><h3>Fire Nights, Real Sky</h3><p>A gas fire table on the deck with the valley lights below, and a real wood-burning fire pit out back. Genuinely dark sky most nights — bring the marshmallows.</p></div></div>
     <div class="highlight-card text-only"><div class="card-body"><h3>Dog-Friendly</h3><p>Pet bowls and a designated spot already set up — bring the whole family.</p></div></div>
     <div class="highlight-card text-only"><div class="card-body"><h3>Close to Everything</h3><p>Across the road from the lake, 5 minutes to Wisp Resort, 5 minutes to Deep Creek Lake State Park and the public launches.</p></div></div>
     <div class="highlight-card text-only"><div class="card-body"><h3>State Park Pass Included</h3><p>The house has an Annual Maryland State Park Pass — free entry at every Maryland state park while you are here. Reservations still apply where a park requires one.</p></div></div>
-    <div class="highlight-card"><img src="photos/balcony-view-real.jpg" alt="Deck view toward the mountains and lake"><div class="card-body"><h3>Wraparound Deck</h3><p>Mountain and lake views from the main living level.</p></div></div>
-  </div>
-</section>
-
-<section id="house-rules">
-  <div class="section-head">
-    <div class="kicker">Before You Arrive</div>
-    <h2>House Rules &amp; More</h2>
-  </div>
-  <div class="rules-grid">
-    <div>
-      <h3>Pets</h3>
-      <p>Dog-friendly — $100 pet fee per dog per stay, 2-dog maximum. A collapsible crate and dog bowls are provided. Let your host know your dog's size/breed at booking for approval. The yard is fertilized, so please clean up after dogs.</p>
-    </div>
-    <div>
-      <h3>Smoking</h3>
-      <p>Strict no-smoking policy anywhere on the property. Evidence of smoking may result in a $500 fee for outdoor cleanup and smell remediation.</p>
-    </div>
-    <div>
-      <h3>Winter Driving</h3>
-      <p>AWD or 4WD is strongly recommended for winter conditions and the driveway.</p>
-    </div>
-    <div>
-      <h3>Indoor Fireplaces</h3>
-      <p>Real, working fireplaces — a current amenity, not just for show.</p>
-    </div>
-    <div>
-      <h3>Garage</h3>
-      <p>The garage is not available for guest use.</p>
-    </div>
-    <div>
-      <h3>Group Age &amp; Size</h3>
-      <p>The booking guest needs to be 28 or older. Groups over 10 are better suited to families with kids, given the bunk-bed layout — the house does not comfortably accommodate 12 adults, and we would rather say so now than have you find out on arrival.</p>
-    </div>
-    <div>
-      <h3>Quiet Hours</h3>
-      <p>11 PM to 8 AM.</p>
-    </div>
-  </div>
-</section>
-
-<section id="safety">
-  <div class="section-head">
-    <div class="kicker">Good to Know Before You Stay</div>
-    <h2>Safety &amp; Property</h2>
-  </div>
-  <div class="rules-grid">
-    <div>
-      <h3>Garage Roof</h3>
-      <p>Please don't let kids or teens climb the rear garage roof.</p>
-    </div>
-    <div>
-      <h3>Lake &amp; Garrett Highway</h3>
-      <p>The lake and Garrett Highway are both nearby — please use caution with dogs and young kids.</p>
-    </div>
-    <div>
-      <h3>Security Cameras</h3>
-      <p>Exterior cameras cover the driveway and yard only. There is zero camera view of the hot tub.</p>
-    </div>
-    <div>
-      <h3>Alarms</h3>
-      <p>CO alarm and smoke alarm both installed.</p>
-    </div>
-    <div>
-      <h3>Noise &amp; Stairs</h3>
-      <p>Some noise carries between levels, and stairs are required to move between them.</p>
-    </div>
-    <div>
-      <h3>Two Entrances</h3>
-      <p>A ground-floor main entrance, plus an upper entrance via the stairs to the left, leading to the front door on the second balcony level.</p>
-    </div>
+    <div class="highlight-card"><img src="photos/deck-view-autumn.jpg" alt="Autumn view from the deck down over the treetops to the lake, the bridge and the mountains beyond" loading="lazy" decoding="async"><div class="card-body"><h3>Wraparound Deck</h3><p>Autumn colour, the lake and the bridge to McHenry below. You are up the hill from the road — that is the view, honestly.</p></div></div>
   </div>
 </section>
 
@@ -406,28 +347,86 @@
   </div>
   <p style="text-align:center; margin:2.25rem 0 0; font-size:0.9rem; color:var(--ink-dim);">Also: full kitchen, dining area, living room, balcony, patio with the hot tub, three full bathrooms, and laundry.</p>
 </section>
-
-<section id="telework">
+<section id="house-rules">
   <div class="section-head">
-    <div class="kicker">Games Downstairs, Work Upstairs</div>
-    <h2>Where the group gathers — and where to actually get work done</h2>
+    <div class="kicker">Before You Arrive</div>
+    <h2>House Rules &amp; More</h2>
   </div>
-  <div class="telework-grid">
-    <div class="telework-card">
-      <img src="photos/theme-room-antique-bar.jpg" alt="Antique bar in the Theme room">
-      <h3>The Antique Bar — the Theme Room's Centerpiece</h3>
-      <p class="bar-story">"This was part of the bar on a steamboat from New Orleans to Baltimore Harbor in 1910. An antique dealer in Amish Country in Eastern Maryland obtained and cut the U-shape bar into 2 Ls. One of which we can now share with you at Bearly Believable." Downstairs, alongside the pool table, dartboard, and TV — this is where the group actually gathers at night, not a workspace.</p>
+  <details class="disclose-block">
+    <summary>Read the house rules</summary>
+  <div class="rules-grid">
+    <div>
+      <h3>Pets</h3>
+      <p>Dog-friendly — $100 pet fee per dog per stay, 2-dog maximum. A collapsible crate and dog bowls are provided. Let your host know your dog's size/breed at booking for approval. The yard is fertilized, so please clean up after dogs.</p>
     </div>
-    <div class="telework-card">
-      <img src="photos/bedroom3-desk-workspace.jpg" alt="Real desk and workspace in Bedroom 3">
-      <h3>Bedroom 3 — the Real Workspace</h3>
-      <p>A real desk and printer upstairs in Bedroom 3 (the green room) — the quiet spot if you actually need to get work done. Downstairs is for games and company, not conference calls.</p>
+    <div>
+      <h3>Smoking</h3>
+      <p>Strict no-smoking policy anywhere on the property. Evidence of smoking may result in a $500 fee for outdoor cleanup and smell remediation.</p>
+    </div>
+    <div>
+      <h3>Winter Driving</h3>
+      <p>AWD or 4WD is strongly recommended for winter conditions and the driveway.</p>
+    </div>
+    <div>
+      <h3>Indoor Fireplaces</h3>
+      <p>Two indoor fireplaces that work: one in the main living room, one in the theme room downstairs.</p>
+    </div>
+    <div>
+      <h3>Garage</h3>
+      <p>The garage is not available for guest use.</p>
+    </div>
+    <div>
+      <h3>Group Age &amp; Size</h3>
+      <p>The booking guest needs to be 28 or older. Groups over 10 are better suited to families with kids, given the bunk-bed layout — the house does not comfortably accommodate 12 adults, and we would rather say so now than have you find out on arrival.</p>
+    </div>
+    <div>
+      <h3>Quiet Hours</h3>
+      <p>11 PM to 8 AM.</p>
     </div>
   </div>
+  </details>
 </section>
 
+<section id="safety">
+  <div class="section-head">
+    <div class="kicker">Good to Know Before You Stay</div>
+    <h2>Safety &amp; Property</h2>
+  </div>
+  <details class="disclose-block">
+    <summary>Read the safety & property notes</summary>
+  <div class="rules-grid">
+    <div>
+      <h3>Garage Roof</h3>
+      <p>Please don't let kids or teens climb the rear garage roof.</p>
+    </div>
+    <div>
+      <h3>Lake &amp; Garrett Highway</h3>
+      <p>The lake and Garrett Highway are both nearby — please use caution with dogs and young kids.</p>
+    </div>
+    <div>
+      <h3>Security Cameras</h3>
+      <p>Exterior cameras cover the driveway and yard only. There is zero camera view of the hot tub.</p>
+    </div>
+    <div>
+      <h3>Alarms</h3>
+      <p>CO alarm and smoke alarm both installed.</p>
+    </div>
+    <div>
+      <h3>Noise &amp; Stairs</h3>
+      <p>Some noise carries between levels, and stairs are required to move between them.</p>
+    </div>
+    <div>
+      <h3>Two Entrances</h3>
+      <p>A ground-floor main entrance, plus an upper entrance via the stairs to the left, leading to the front door on the second balcony level.</p>
+    </div>
+  </div>
+  </details>
+</section>
+
+
+
 <footer>
-  <div class="brand" style="display:flex;"><img class="bear-logo" src="assets/brand/bertha-logo.png" alt=""> Bearly Believable</div>
+  <div class="brand" style="display:flex;"><img class="bear-logo" src="assets/brand/bertha-logo.png" alt="" loading="lazy" decoding="async"> Bearly Believable</div>
   160 Leo Friend Road, Oakland, MD · Deep Creek Lake<br>
   Questions before you book? Message Rick and Jen through the Airbnb listing — that is where we pick things up fastest. Already booked? Your confirmation has our direct contact details.
 </footer>
