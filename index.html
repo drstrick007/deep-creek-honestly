@@ -36,6 +36,8 @@
 
   .hero { position: relative; height: min(62vh, 560px); min-height: 420px; }
   .hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
+  .hero img.hero-img { object-position: 62% 52%; }
+  @media (max-width: 640px) { .hero img.hero-img { object-position: 68% 55%; } }
   .hero-overlay {
     position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,20,15,0.1) 0%, rgba(20,20,15,0.6) 100%);
     display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; text-align: center;
@@ -97,7 +99,23 @@
   .rules-grid p { margin: 0; color: var(--ink-dim); font-size: 0.92rem; }
   @media (max-width: 760px) { .rules-grid { grid-template-columns: 1fr; } }
 
-  .room-list { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; }
+  /* 2026-08-24: rooms were a row of text pills. Strong photography of these rooms
+     existed the whole time in the owner's own library and simply was not on the site.
+     A prospective guest should SEE the primary suite, not read the word "Bedroom 1". */
+  .room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .room-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+               display: flex; flex-direction: column; }
+  .room-card .room-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #efe9dd; }
+  .room-card.feature { grid-column: span 2; }
+  .room-card.feature .room-photo { aspect-ratio: 16 / 10; }
+  .room-card .room-body { padding: 1.15rem 1.25rem 1.35rem; }
+  .room-card h3 { margin: 0 0 0.3rem; font-size: 1.05rem; }
+  .room-card .room-meta { font-size: 0.78rem; color: var(--accent); font-weight: 600; letter-spacing: 0.03em;
+                          text-transform: uppercase; margin: 0 0 0.5rem; }
+  .room-card p { margin: 0; font-size: 0.9rem; color: var(--ink-dim); line-height: 1.55; }
+  @media (max-width: 900px) { .room-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .room-grid { grid-template-columns: 1fr; } .room-card.feature { grid-column: span 1; } }
+  .room-list { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 2rem; }
   .room-list span { background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 0.5rem 1.1rem; font-size: 0.88rem; color: var(--ink-dim); }
 
   .telework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; }
@@ -132,6 +150,7 @@
     <a href="#" class="brand"><img class="bear-logo" src="assets/brand/bertha-logo.png" alt="Bertha"> Bearly Believable</a>
     <div class="nav-links">
       <a href="#about">The House</a>
+      <a href="#rooms">Rooms</a>
       <a href="#gallery">Photos</a>
       <a href="#house-rules">House Rules</a>
       <a href="#bertha">Ask Bertha</a>
@@ -141,7 +160,7 @@
 </nav>
 
 <div class="hero">
-  <img src="photos/night-deck-lights.jpg" alt="Bearly Believable at night, deck strung with red and white holiday lights above a snow-covered slope">
+  <img class="hero-img" src="photos/night-snow-exterior.jpg" alt="Bearly Believable lit up at night in deep snow, the tall gable windows glowing gold">
   <div class="hero-overlay">
     <div class="kicker">Deep Creek Lake · McHenry, Maryland</div>
     <h1>Bearly Believable</h1>
@@ -289,13 +308,81 @@
     <h2>Room by room</h2>
     <p>Five bedrooms, three full bathrooms, and a house built for a full group to actually spread out.</p>
   </div>
-  <div class="room-list">
-    <span>Exterior</span><span>Living Room</span><span>Patio (Hot Tub)</span><span>Dining Area</span>
-    <span>Full Kitchen</span><span>Theme Room (Bar, Pool Table, Darts, TV)</span>
-    <span>Bedroom 1 — Primary Suite</span><span>Full Bathroom 1 (Jacuzzi Tub)</span>
-    <span>Bedroom 2</span><span>Bedroom 3 (Desk + Workspace)</span><span>Bedroom 4</span>
-    <span>Bedroom 5 (Bunk Beds)</span><span>Full Bathroom 3</span><span>Balcony</span><span>Laundry Area</span>
+  <div class="room-grid">
+    <div class="room-card feature">
+      <img class="room-photo" src="photos/primary-suite-cathedral.jpg" alt="Primary suite with a cathedral ceiling and tall A-frame gable windows at dusk" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Bedroom 1 &middot; Upper floor</p>
+        <h3>The primary suite, under the gable</h3>
+        <p>The whole peak of the house is one room: cathedral ceiling, hanging lights, and triangular windows that fill with blue at dusk and with trees in the morning. Queen bed, its own sitting chair, and room to actually walk around.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/primary-suite-ensuite-tub.jpg" alt="Tiled en-suite bathroom with a soaking tub, opening into the primary bedroom" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">En-suite &middot; Bathroom 1</p>
+        <h3>Jacuzzi tub, steps from the bed</h3>
+        <p>The primary bathroom opens straight into the bedroom &mdash; tiled soaking tub, for the evening after a day on the mountain.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/bunk-room-family.jpg" alt="Bunk room with a bunk bed, a second full bed, and a small desk" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Bedroom 5 &middot; Lower floor</p>
+        <h3>The bunk room</h3>
+        <p>Bunk beds plus a second full bed, a little desk in the corner, and a sign on the wall that reads <em>Don&rsquo;t Wake The Bear</em>. This is the room kids ask for.</p>
+      </div>
+    </div>
+    <div class="room-card feature">
+      <img class="room-photo" src="photos/antique-bar-full.jpg" alt="Long antique wooden bar with leather stools in the theme room" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Theme room &middot; Lower floor</p>
+        <h3>A bar that used to be on a steamboat</h3>
+        <p>This was part of the bar on a steamboat that ran from New Orleans to Baltimore Harbor in 1910. An antique dealer in Amish country in eastern Maryland got hold of it and cut the U-shaped bar into two L&rsquo;s. One of them is here, and you&rsquo;re welcome to it.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/game-room-pool-dog.jpg" alt="Game room with a pool table, large sectional sofa, and a dog resting on the couch" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Theme room &middot; Games</p>
+        <h3>Pool table, darts, and the couch</h3>
+        <p>Full-size pool table, darts, board games, and enough sofa for everyone who isn&rsquo;t playing. Dogs are welcome here, and they know it.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/theme-room-fireplace-tv.jpg" alt="Theme room seating area with a 70-inch television and a lit fireplace" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Theme room &middot; Evenings</p>
+        <h3>70&Prime; TV and the fire going</h3>
+        <p>The other end of the same room: big screen, fireplace lit, cards on the trunk. Where the group ends up after dinner.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/bedroom3-desk-workspace.jpg" alt="Bedroom with a real desk and printer set up as a quiet workspace" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Bedroom 3 &middot; The green room</p>
+        <h3>The one with the real desk</h3>
+        <p>A proper desk and a printer, away from the noise &mdash; the room to take the call in if someone has to work for an hour.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/bedroom-quilt-bear.jpg" alt="Bedroom with a patchwork quilt and a small teddy bear sitting in a twig rocking chair" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Bedroom 2</p>
+        <h3>Quilts, and a bear in a rocking chair</h3>
+        <p>There are bears all over this house &mdash; in pictures, on shelves, tucked into corners. Families have turned finding them into a game. We&rsquo;re not telling you where they all are.</p>
+      </div>
+    </div>
+    <div class="room-card">
+      <img class="room-photo" src="photos/night-snow-exterior.jpg" alt="The house lit up at night in deep snow, with the gable windows glowing" loading="lazy">
+      <div class="room-body">
+        <p class="room-meta">Outside &middot; Winter</p>
+        <h3>Arriving in the snow</h3>
+        <p>Wisp is close, the driveway gets plowed, and the house looks like this when you pull in after dark.</p>
+      </div>
+    </div>
   </div>
+  <p style="text-align:center; margin:2.25rem 0 0; font-size:0.9rem; color:var(--ink-dim);">Also: full kitchen, dining area, living room, balcony, patio with the hot tub, three full bathrooms, and laundry.</p>
 </section>
 
 <section id="telework">
