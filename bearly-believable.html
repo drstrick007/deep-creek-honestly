@@ -139,6 +139,28 @@
   .bertha-float .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
   .bertha-float .label { font-size: 0.7rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) { .bertha-float { transition: none; } }
+  /* 2026-08-21, Rick's product decision after reproducing the failure AGAIN after a
+     single question: stop solving "where did Bertha go" with positioning tricks.
+     This is a SECOND, real Bertha in normal document flow, sitting between the
+     conversation and the composer. It depends on no sticky behavior, no viewport
+     geometry, no scroll container, and not on whether the top avatar happens to
+     still be on screen -- it is simply always there, immediately above the box
+     the guest types into. Deliberate redundancy for the beta; the top Bertha and
+     the float cue both stay. */
+  .bertha-anchor {
+    display: flex; align-items: center; gap: 0.55rem;
+    margin: 0.75rem 0 0.15rem; padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+  }
+  .bertha-anchor .avatar-md {
+    width: 2.6rem; height: 2.6rem; border-radius: 50%; overflow: hidden; background: #f0ede6;
+    display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .bertha-anchor .avatar-md img { width: 100%; height: 100%; object-fit: cover; }
+  .bertha-anchor .anchor-copy { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+  .bertha-anchor .anchor-name { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
+  .bertha-anchor .anchor-hint { font-size: 0.74rem; color: var(--text-dim); }
   .bertha-msg { margin: 0.6rem 0; font-size: 0.9rem; line-height: 1.5; animation: msg-in 0.25s ease; }
   @keyframes msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .bertha-msg.user { text-align: right; }
@@ -164,6 +186,31 @@
     color: var(--accent); background: var(--accent-dim); border-radius: 999px;
     padding: 0.12rem 0.55rem; margin-bottom: 0.3rem;
   }
+  /* 2026-08-22, Rick: "the current tiny inline avatar is NOT sufficient ... this is
+     an accessibility / perceptibility issue, not a preference issue." The inline
+     avatar is 1.9rem (~30px) -- at normal phone reading distance an adult traveler
+     cannot tell ski Bertha from food Bertha at that size, and changing the asset is
+     not the same as the guest perceiving the change. This card carries the adaptive
+     image at a size that reads without zooming, in the conversation flow, tied to
+     the reply that triggered it. It renders ONLY when the resolved mode actually
+     changes, so consecutive replies in the same mode do not stack images. */
+  .bertha-mode-card {
+    margin: 0.6rem 0 0.15rem 0; border-radius: 14px; overflow: hidden;
+    background: #f0ede6; box-shadow: 0 0 0 1px var(--border);
+    width: min(86%, 300px);
+  }
+  .bertha-mode-card img {
+    display: block; width: 100%; height: auto; max-height: 300px; object-fit: cover;
+  }
+  .bertha-mode-card .mode-cap {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.02em; color: var(--accent);
+    padding: 0.4rem 0.7rem; background: var(--accent-dim);
+  }
+  .bertha-mode-card .mode-fallback {
+    display: flex; align-items: center; justify-content: center;
+    height: 160px; font-size: 3.4rem;
+  }
+  @media (max-width: 380px) { .bertha-mode-card { width: min(92%, 260px); } }
   .typing-dots { display: inline-flex; gap: 0.28rem; padding: 0.7rem 1rem; background: #f0ede6; border-radius: 16px; border-bottom-left-radius: 4px; }
   .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #9a9285; animation: bounce 1.2s infinite ease-in-out; }
   .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
@@ -257,6 +304,13 @@
       Bertha's chat isn't reachable right now — use the search/browse below instead. She's just resting, not gone.
     </div>
     <div class="bertha-log" id="bertha-log"><div class="bertha-log-sticky" id="bertha-log-sticky"><span class="avatar-sm" id="bertha-log-sticky-avatar">🐻</span><span class="label" id="bertha-log-sticky-label">Bertha</span></div></div>
+    <div class="bertha-anchor" id="bertha-anchor">
+      <span class="avatar-md" id="bertha-anchor-avatar">&#128059;</span>
+      <span class="anchor-copy">
+        <span class="anchor-name" id="bertha-anchor-label">Bertha</span>
+        <span class="anchor-hint">Still here &mdash; ask me anything else.</span>
+      </span>
+    </div>
     <div class="bertha-input-row" id="bertha-input-row">
       <input type="text" id="bertha-input" placeholder="Ask about restaurants, activities, hours, directions...">
       <button id="bertha-send">Send</button>
@@ -286,7 +340,7 @@
   <h3 style="margin:0 0 0.4rem; font-size:0.9rem; color:var(--text);">A quick note</h3>
   <p style="margin:0 0 0.6rem;"><strong>What this is:</strong> an informal local guide put together by your host, not an official safety authority. Hours, directions, and details are curated from what we could find and haven't been independently verified — always confirm anything time-sensitive or safety-related directly with the business.</p>
   <p style="margin:0 0 0.6rem;"><strong>Your privacy:</strong> browsing and searching the guide list happens right on your phone and isn't sent or tracked anywhere. If you chat with Bertha, the text of your question and her answer is sent to an AI service to generate a reply and logged for up to 60 days to help us improve her, then deleted — no name, phone, email, or reservation/property info is ever collected or stored. Rick is the named owner of this data; reach him directly with any question or concern.</p>
-  <p id="feedback-intro-copy" style="margin:0 0 0.7rem;"><strong>Bertha feedback, not a stay review:</strong> since you're helping us try out this early version of Bertha, we'd like to add a $50 credit to your current Airbnb stay as a thank-you. Use it however you'd like during the trip — Honi-Honi, dinner, an activity, or somewhere else Bertha helps you discover. There's absolutely no requirement to give positive feedback. What helps us most is simply hearing what worked, what was wrong, what was missing, or what would have made Bertha more useful. This is completely separate from your Airbnb review of the house/stay itself — please leave that on Airbnb as usual.</p>
+  <p id="feedback-intro-copy" style="margin:0 0 0.7rem;"><strong>Bertha feedback, not a stay review:</strong> Bertha is an early version and we're still teaching her. If you have a moment, we'd love to hear what worked, what was wrong, what was missing, or what would have made her more useful. This is completely separate from an Airbnb review of the house/stay itself.</p>
   <button id="feedback-open-btn" type="button" style="padding:0.6rem 1.1rem; border-radius:999px; border:none; background:linear-gradient(120deg, var(--accent), var(--accent2)); color:white; font-size:0.85rem; font-weight:600; cursor:pointer;">Give Bertha feedback</button>
 </div>
 
@@ -331,7 +385,7 @@
     </form>
     <div id="feedback-thanks" style="display:none; text-align:center; padding:1.2rem 0.4rem;">
       <p style="font-size:0.95rem; font-weight:600; margin:0 0 0.4rem;">Thanks — this goes directly to our Bertha beta review.</p>
-      <p id="feedback-thanks-credit-line" style="font-size:0.82rem; color:var(--text-dim); margin:0;">Your $50 credit is on its way regardless of what you told us. Feel free to close this and keep chatting with Bertha.</p>
+      <p id="feedback-thanks-credit-line" style="font-size:0.82rem; color:var(--text-dim); margin:0;">Feel free to close this and keep chatting with Bertha.</p>
       <button id="feedback-done-btn" type="button" style="margin-top:1rem; padding:0.6rem 1.1rem; border-radius:999px; border:1px solid var(--border); background:white; color:var(--text); font-size:0.85rem; font-weight:600; cursor:pointer;">Close</button>
     </div>
   </div>
@@ -1155,6 +1209,19 @@ function applyBerthaMode(modeId, source) {
     }
     stickyLabel.textContent = berthaModeLabel(modeId);
   }
+  // The in-flow anchor above the composer (see .bertha-anchor CSS). Updates on
+  // every mode change for the same reason the sticky bar does: it is one of the
+  // Bertha images the guest is most likely to actually be looking at.
+  const anchorAvatar = document.getElementById('bertha-anchor-avatar');
+  const anchorLabel = document.getElementById('bertha-anchor-label');
+  if (anchorAvatar && anchorLabel) {
+    if (mode.approved) {
+      anchorAvatar.innerHTML = `<img src="${BERTHA_ASSETS.asset_dir}${mode.filename}" alt="${mode.alt_text}" onerror="this.parentElement.textContent='${mode.placeholder_emoji}'">`;
+    } else {
+      anchorAvatar.textContent = mode.placeholder_emoji;
+    }
+    anchorLabel.textContent = berthaModeLabel(modeId);
+  }
   const floatAvatar = document.getElementById('bertha-float-avatar');
   const floatLabel = document.getElementById('bertha-float-label');
   if (floatAvatar && floatLabel) {
@@ -1188,7 +1255,7 @@ function berthaInitFloat() {
     // Only relevant while the guest is actually at the chat.
     const boxOnScreen = b.bottom > 0 && b.top < vh;
     // Is any real in-box avatar already visible? If so, stay hidden.
-    const anchors = ['chat-avatar', 'bertha-log-sticky'].map(id => document.getElementById(id));
+    const anchors = ['chat-avatar', 'bertha-log-sticky', 'bertha-anchor'].map(id => document.getElementById(id));
     const anchorVisible = anchors.some(el => {
       if (!el || !el.offsetParent) return false;
       const r = el.getBoundingClientRect();
@@ -1239,7 +1306,10 @@ function fileToBase64(file) {
   });
 }
 
-// 2026-08-20, Rick's directive: the $50 credit is a real Airbnb-stay thank-you for
+// 2026-08-23: RETIRED. Kept as a no-op guard, not deleted -- if a credit offer is ever
+// re-introduced for a future real beta stay, this is the seam that must keep it away from
+// family testing. Original note follows.
+// 2026-08-20, Rick's directive: the $50 credit was a real Airbnb-stay thank-you for
 // Joseph's real guest beta and must never be implied for Rick's own family testing
 // (fleitas_family_test), which isn't a real stay and isn't getting a credit --
 // scoped by the same experience_id already used for context/telemetry isolation
@@ -1322,24 +1392,16 @@ document.getElementById('feedback-form').addEventListener('submit', async (e) =>
     const data = await res.json();
     if (!res.ok || !data.ok) throw new Error(data.error || 'submit failed');
 
-    // 2026-08-20, Rick's directive, checked fresh on every real submission rather
-    // than only once at page load (belt-and-suspenders against any stale-page
-    // scenario, and this is also where the once-only Joseph behavior has to live):
-    // family (fleitas_family_test) NEVER sees $50/credit language, full stop. For
-    // Joseph, the $50 is a one-time thank-you for participating, not per-submission
-    // compensation -- mentioning it after every single piece of feedback risks
-    // reframing genuine participation into paid microtasks. Shown once on his first
-    // real submission, remembered via localStorage, neutral on every one after that.
+    // 2026-08-23, Rick's directive (overnight rebuild, section 0): Joseph's beta stay
+    // has ENDED, so the $50 Airbnb-stay thank-you is retired. It was scoped to one real
+    // booked guest; left in place on a public URL it became a standing cash offer to any
+    // stranger who found the page. Removed rather than re-scoped -- there is no current
+    // beta stay to attach it to. Previous behavior (shown once to Joseph, never to
+    // fleitas_family_test, localStorage-remembered) is recorded in git history, not lost.
     const creditLine = document.getElementById('feedback-thanks-credit-line');
     if (creditLine) {
-      const isFamily = experienceId === 'fleitas_family_test';
-      const alreadyAcknowledged = localStorage.getItem('bertha_beta_credit_acknowledged') === 'true';
-      if (isFamily || alreadyAcknowledged) {
-        creditLine.textContent = 'Feel free to close this and keep chatting with Bertha.';
-      } else {
-        creditLine.textContent = 'Your $50 credit is on its way regardless of what you told us. Feel free to close this and keep chatting with Bertha.';
-        localStorage.setItem('bertha_beta_credit_acknowledged', 'true');
-      }
+      creditLine.textContent = 'Feel free to close this and keep chatting with Bertha.';
+    }
     }
 
     document.getElementById('feedback-form').style.display = 'none';
@@ -1360,6 +1422,36 @@ function berthaShowChatUI() {
   document.getElementById('bertha-gate').style.display = 'none';
   document.getElementById('bertha-log').style.display = 'block';
   document.getElementById('bertha-input-row').style.display = 'flex';
+}
+
+// The large in-flow adaptive image. Deliberately separate from the 1.9rem inline
+// avatar, which stays: the avatar is the per-message identity cue, this is the
+// perceptibility guarantee. Falls back to the mode's placeholder emoji at a size
+// that is still legible, never to a broken image.
+// Named handler rather than an inline onerror string: the inline version needed
+// nested escaped quotes inside a template literal inside an HTML attribute, which
+// is exactly the kind of thing that works until it silently doesn't.
+function berthaModeImgFallback(img) {
+  const div = document.createElement('div');
+  div.className = 'mode-fallback';
+  div.textContent = img.getAttribute('data-emoji') || '\u{1F43B}';
+  img.replaceWith(div);
+}
+
+function berthaModeCardHTML(modeId) {
+  if (!BERTHA_ASSETS) return '';
+  const mode = _resolveApprovedMode(modeId || currentMode);
+  if (!mode) return '';
+  const label = berthaModeLabel(modeId) || '';
+  const src = BERTHA_ASSETS.asset_dir + mode.filename;
+  const alt = (mode.alt_text || 'Bertha').replace(/"/g, '&quot;');
+  const emoji = mode.placeholder_emoji || '\u{1F43B}';
+  return `
+    <div class="bertha-mode-card">
+      <img src="${src}" alt="${alt}" loading="lazy"
+           data-emoji="${emoji}" onerror="berthaModeImgFallback(this)">
+      ${label ? `<div class="mode-cap">${label}</div>` : ''}
+    </div>`;
 }
 
 function berthaAppendMsg(role, text, cat, modeId) {
@@ -1384,6 +1476,7 @@ function berthaAppendMsg(role, text, cat, modeId) {
         ${showLabel ? `<div class="mode-label">${berthaModeLabel(modeId)}</div>` : ''}
         <div class="bubble"></div>
         ${cat ? `<div class="cat">${cat}</div>` : ''}
+        ${showLabel ? berthaModeCardHTML(modeId) : ''}
       </div>`;
   } else {
     div.innerHTML = `<div class="bubble"></div>` + (cat ? `<div class="cat">${cat}</div>` : '');
@@ -1568,8 +1661,15 @@ async function berthaSend() {
       return;
     }
     if (!data.ai_available) {
+      // A bad model response is NOT the service being down. Saying "Bertha isn't
+      // reachable" when /health is green misled a guest AND triggered a P0
+      // escalation on 2026-08-22. Only a genuine service failure shows the banner.
+      if (data.failure_class === 'MODEL_RESPONSE_FAILED') {
+        berthaAppendMsg('bear', data.guest_message || "I hit a snag answering that one. Try once more, or use the guide below.");
+        return;
+      }
       document.getElementById('bertha-fallback-note').style.display = 'block';
-      berthaAppendMsg('bear', "I'm having trouble right now — try the search below instead.");
+      berthaAppendMsg('bear', data.guest_message || "I'm having trouble right now — try the search below instead.");
       return;
     }
     berthaAppendMsg('bear', data.answer, data.category === 'off_topic_blocked' ? 'not something I can help with' : (data.uncertain ? "not fully confirmed — verify directly" : ''), data.mode_id);
@@ -1578,9 +1678,10 @@ async function berthaSend() {
     if (data.events && data.events.length) berthaAppendEventCards(data.events);
     if (data.mode_id) applyBerthaMode(data.mode_id, 'user_question');
   } catch (e) {
+    // fetch() itself rejected -- this genuinely IS service-unreachable.
     berthaHideTyping();
     document.getElementById('bertha-fallback-note').style.display = 'block';
-    berthaAppendMsg('bear', "I'm having trouble right now — try the search below instead.");
+    berthaAppendMsg('bear', "I can't reach my notes right now — the search below still works.");
   }
 }
 
