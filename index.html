@@ -167,6 +167,17 @@
   .disclose-block summary::after{content:" ▾";font-size:.8em}
   .disclose-block[open] summary::after{content:" ▴"}
   .disclose-block[open] summary{margin-bottom:1.25rem}
+  .bed-table-wrap{max-width:1100px;margin:0 auto 2.2rem;padding:0 1.25rem;overflow-x:auto}
+  .bed-table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);
+    border-radius:14px;overflow:hidden;font-size:.94rem;min-width:520px}
+  .bed-table caption{text-align:left;font-weight:800;padding:0 0 .7rem;color:var(--ink);font-size:1.05rem}
+  .bed-table th,.bed-table td{padding:.8rem .9rem;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  .bed-table thead th{background:var(--accent-light);color:var(--accent-dark);font-size:.78rem;
+    text-transform:uppercase;letter-spacing:.06em}
+  .bed-table tbody tr:last-child td{border-bottom:1px solid var(--border)}
+  .bed-table tfoot td{background:#faf7f2;border-bottom:none}
+  .bed-table .only{color:var(--ink-dim);font-weight:400}
+  .bed-note{max-width:1100px;margin:.9rem auto 0;color:var(--ink-dim);font-size:.9rem;line-height:1.6}
 </style>
 </head>
 <body>
@@ -214,9 +225,10 @@
       </div>
     </div>
     <p style="max-width:760px;margin:1.6rem auto 0;font-size:0.92rem;color:var(--ink-dim);line-height:1.6;text-align:center;">
-      <strong>How it sleeps:</strong> five bedrooms and seven beds &mdash; one king, three queens, a room with a queen plus bunks &mdash;
-      plus a pullout in the basement. Thirteen is the <em>family</em> number: it only works with kids in the bunks and on the pullout.
-      For a group of adults, think of this as a house for about eight to ten, and talk to us first if you are over ten.
+      <strong>How it sleeps:</strong> five bedrooms, seven beds, thirteen people &mdash; one king, three queens, and a
+      basement bedroom with a queen plus a twin-over-full bunk. Thirteen is the <em>family</em> number: it only works in a
+      family configuration that includes children, in the bunk. This house is <strong>not appropriate for 12&ndash;13 adults</strong>.
+      For an all-adult group, think of it as a house for about eight to ten, and talk to us first if you are over ten.
     </p>
   </div>
 </section>
@@ -271,13 +283,29 @@
     <h2>Room by room</h2>
     <p>Five bedrooms, three full bathrooms, and a house built for a full group to actually spread out.</p>
   </div>
+  <div class="bed-table-wrap">
+    <table class="bed-table">
+      <caption>Sleeping arrangements</caption>
+      <thead><tr><th scope="col">Bedroom</th><th scope="col">Floor</th><th scope="col">Bed(s)</th><th scope="col">Sleeps</th></tr></thead>
+      <tbody>
+        <tr><td>Primary suite</td><td>Upper</td><td>King <span class="only">(the only king in the house)</span></td><td>2</td></tr>
+        <tr><td>Bedroom 2</td><td>Main</td><td>Queen</td><td>2</td></tr>
+        <tr><td>Bedroom 3</td><td>Main</td><td>Queen <span class="only">(the one with the desk)</span></td><td>2</td></tr>
+        <tr><td>Bedroom 4</td><td>Main</td><td>Queen</td><td>2</td></tr>
+        <tr><td>Basement bedroom</td><td>Lower</td><td>Queen + twin-over-full bunk <span class="only">(stairs, not a ladder)</span></td><td>5</td></tr>
+      </tbody>
+      <tfoot><tr><td colspan="3"><strong>Five bedrooms · seven beds</strong></td><td><strong>13</strong></td></tr></tfoot>
+    </table>
+    <p class="bed-note">Thirteen is a <strong>family</strong> number and depends on children using the bunk.
+    Bearly Believable is <strong>not appropriate for 12&ndash;13 adults</strong>. For an all-adult group, plan on eight to ten.</p>
+  </div>
   <div class="room-grid">
     <div class="room-card feature">
       <img class="room-photo" src="photos/primary-suite-cathedral.jpg" alt="Primary suite with a cathedral ceiling and tall A-frame gable windows at dusk" loading="lazy">
       <div class="room-body">
         <p class="room-meta">Bedroom 1 &middot; Upper floor</p>
         <h3>The primary suite, under the gable</h3>
-        <p>The whole peak of the house is one room: cathedral ceiling, hanging lights, and triangular windows that fill with blue at dusk and with trees in the morning. Queen bed, its own sitting chair, and room to actually walk around. Its own bathroom opens straight off it, jacuzzi tub included.</p>
+        <p>The whole peak of the house is one room: cathedral ceiling, hanging lights, and triangular windows that fill with blue at dusk and with trees in the morning. King bed &mdash; the only one in the house &mdash; its own sitting chair, and room to actually walk around. Its own bathroom opens straight off it, jacuzzi tub included.</p>
       </div>
     </div>
     <div class="room-card">
@@ -293,7 +321,7 @@
       <div class="room-body">
         <p class="room-meta">Bedroom 5 &middot; Lower floor</p>
         <h3>The bunk room</h3>
-        <p>Bunk beds plus a second full bed, a little desk in the corner, and a sign on the wall that reads <em>Don&rsquo;t Wake The Bear</em>. This is the room kids ask for.</p>
+        <p>A queen plus a twin-over-full bunk &mdash; and the bunk is reached by <strong>stairs, not a ladder</strong>, which is the detail parents actually want. A little desk in the corner, and a sign on the wall that reads <em>Don&rsquo;t Wake The Bear</em>. This is the room kids ask for.</p>
       </div>
     </div>
     <div class="room-card feature">
