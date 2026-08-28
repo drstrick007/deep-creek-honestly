@@ -1,166 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>Bertha Lab</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Bertha has moved</title>
+<link rel="canonical" href="https://pivotalvacationproperties.com/ask-bertha/">
+<meta name="robots" content="noindex, follow">
+<!--
+  Retired 2026-08-28. This page moved to pivotalvacationproperties.com.
+
+  GitHub Pages serves static files only, so there is no 301 available here. The
+  redirect is done in script and carries the query string with it, because the
+  query string is the whole point: ?experience=amandafam_beta is what tells the
+  backend which beta cohort a guest belongs to, and dropping it would silently
+  file an active tester's answers and feedback under public traffic.
+
+  The session id in localStorage travels too, as ?bbs= -- deliberately not ?s=,
+  which WordPress reserves for site search and which turns any destination URL
+  into a "Page not found". localStorage is per-origin,
+  so without that hand-off every returning beta tester would start a brand new
+  conversation on the new domain and their feedback history would split in two.
+  The new site adopts it once and strips it from the address bar.
+
+  location.replace, not location.href: the old URL must not sit in the back
+  button, or a guest pressing back lands here and bounces forward again.
+
+  The meta refresh below is the fallback for a browser with script disabled. It
+  cannot carry the query string, so it is deliberately second and not first.
+-->
+<meta http-equiv="refresh" content="3;url=https://pivotalvacationproperties.com/ask-bertha/">
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #14161a; color: #e8e8e8; padding: 1rem; }
-  h1 { font-size: 1.1rem; margin: 0 0 0.2rem; }
-  .sub { color: #888; font-size: 0.8rem; margin-bottom: 1rem; }
-  textarea { width: 100%; min-height: 4.5rem; background: #1e2126; color: #eee; border: 1px solid #333; border-radius: 8px; padding: 0.6rem; font-size: 1rem; resize: vertical; }
-  .modes { display: flex; gap: 0.5rem; margin: 0.6rem 0; flex-wrap: wrap; }
-  button { background: #2a2e35; color: #eee; border: 1px solid #444; border-radius: 8px; padding: 0.55rem 0.9rem; font-size: 0.9rem; cursor: pointer; }
-  button:active { background: #3a3f47; }
-  button.primary { background: #2d6a4f; border-color: #40916c; }
-  button.run-all { background: #7c4a2d; border-color: #b5652f; width: 100%; margin-top: 0.4rem; }
-  button:disabled { opacity: 0.5; }
-  .session-row { display: flex; gap: 0.5rem; align-items: center; margin: 0.6rem 0; font-size: 0.75rem; color: #888; }
-  .session-row input { background: #1e2126; color: #aaa; border: 1px solid #333; border-radius: 6px; padding: 0.3rem 0.5rem; font-size: 0.7rem; flex: 1; }
-  .session-row button { padding: 0.3rem 0.6rem; font-size: 0.7rem; }
-  .panel { background: #1e2126; border: 1px solid #333; border-radius: 10px; padding: 0.8rem; margin-top: 0.8rem; }
-  .panel h3 { margin: 0 0 0.4rem; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #9cc; }
-  .panel .answer { white-space: pre-line; font-size: 0.95rem; line-height: 1.4; margin-bottom: 0.6rem; }
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 0.8rem; font-size: 0.75rem; color: #aaa; border-top: 1px solid #333; padding-top: 0.5rem; }
-  .stats b { color: #ddd; }
-  .compare-grid { display: grid; grid-template-columns: 1fr; gap: 0.8rem; }
-  @media (min-width: 900px) { .compare-grid { grid-template-columns: 1fr 1fr 1fr; } }
-  .history-log { margin-top: 1rem; }
-  .turn { border-left: 2px solid #444; padding-left: 0.6rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
-  .turn .q { color: #9cc; }
-  .turn .a { color: #ccc; white-space: pre-line; }
-  .err { color: #e88; }
-  .loading { color: #999; font-style: italic; }
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       background:#F6F1E7;color:#2F3B2C;
+       font:400 17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .card{max-width:30rem;padding:2rem;text-align:center}
+  h1{font-size:1.3rem;font-weight:600;margin:0 0 .6rem}
+  p{margin:0 0 1.2rem;opacity:.85}
+  a{color:#2F3B2C}
 </style>
 </head>
 <body>
-
-<h1>🐻 Bertha Lab</h1>
-<div class="sub">Founder testing infrastructure -- not linked in guest navigation. Compares real production backend behaviors side by side.</div>
-
-<textarea id="msg" placeholder="Type a guest question..."></textarea>
-
-<div class="modes">
-  <button class="primary" onclick="runOne('fast')">A — Fast</button>
-  <button class="primary" onclick="runOne('retrieval')">B — Retrieval</button>
-  <button class="primary" onclick="runOne('full')">C — Full Bertha</button>
-</div>
-<button class="run-all" onclick="runAll()">Run same question in all 3</button>
-
-<div class="session-row">
-  session: <input id="sid" readonly> <button onclick="newSession()">New conversation</button>
-</div>
-
-<div id="single-result"></div>
-<div id="compare-result"></div>
-
-<div class="history-log" id="history"></div>
-
-<script>
-const API = 'https://decision-desk-ai.tail0a94a7.ts.net';
-let sessionId = localStorage.getItem('bertha_lab_sid') || crypto.randomUUID();
-let turns = JSON.parse(localStorage.getItem('bertha_lab_turns') || '[]'); // [[q,a], ...] -- shared context across modes
-document.getElementById('sid').value = sessionId;
-localStorage.setItem('bertha_lab_sid', sessionId);
-
-function newSession() {
-  sessionId = crypto.randomUUID();
-  turns = [];
-  localStorage.setItem('bertha_lab_sid', sessionId);
-  localStorage.setItem('bertha_lab_turns', '[]');
-  document.getElementById('sid').value = sessionId;
-  document.getElementById('history').innerHTML = '';
-  document.getElementById('single-result').innerHTML = '';
-  document.getElementById('compare-result').innerHTML = '';
-}
-
-function statsHTML(r) {
-  return `<div class="stats">
-    <div>total: <b>${r.total_latency_ms}ms</b></div>
-    <div>retrieval: <b>${r.retrieval_latency_ms}ms</b></div>
-    <div>voice pass: <b>${r.voice_latency_ms}ms</b></div>
-    <div>web search: <b>${r.web_search_used ? 'yes' : 'no'}</b></div>
-    <div>model(s): <b>${r.models_used}</b></div>
-    <div>cost: <b>$${r.cost_usd}</b></div>
+  <div class="card">
+    <h1>Bearly Believable has moved</h1>
+    <p>Taking you to the new site&hellip;</p>
+    <p><a id="go" href="https://pivotalvacationproperties.com/ask-bertha/">pivotalvacationproperties.com</a></p>
   </div>
-  <div style="font-size:0.75rem;color:#888;margin-top:0.3rem;">sources: ${r.sources_used.length ? r.sources_used.join(', ') : '(none cited)'}</div>`;
-}
+<script>
+(function(){
+  var DEST = "https://pivotalvacationproperties.com/ask-bertha/";
+  var q = new URLSearchParams(location.search);
 
-function modeLabel(m) { return {fast: 'A — Fast', retrieval: 'B — Retrieval', full: 'C — Full Bertha'}[m]; }
+  // Anything the guest arrived with is kept. utm_* included: a beta link may have
+  // been shared onward and that attribution is real too.
+  var out = new URLSearchParams();
+  ["experience","cohort","fb","utm_source","utm_medium","utm_campaign","utm_content","utm_term","q"]
+    .forEach(function(k){ var v = q.get(k); if (v) out.set(k, v); });
 
-async function callDebug(message, mode, historyOverride) {
-  const body = {session_id: sessionId, message, mode};
-  if (historyOverride) body.history = historyOverride;
-  const res = await fetch(API + '/debug_chat', {
-    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
-  });
-  return res.json();
-}
-
-function appendHistory(q, a) {
-  turns.push([q, a]);
-  localStorage.setItem('bertha_lab_turns', JSON.stringify(turns));
-  const el = document.getElementById('history');
-  const div = document.createElement('div');
-  div.className = 'turn';
-  div.innerHTML = `<div class="q">You: ${q}</div><div class="a">Bertha: ${a}</div>`;
-  el.prepend(div);
-}
-
-async function runOne(mode) {
-  const msg = document.getElementById('msg').value.trim();
-  if (!msg) return;
-  const out = document.getElementById('single-result');
-  document.getElementById('compare-result').innerHTML = '';
-  out.innerHTML = `<div class="panel"><div class="loading">Running ${modeLabel(mode)}...</div></div>`;
+  // Hand the beta session across the origin boundary. Only a well-formed UUID is
+  // passed on -- never whatever happens to be sitting in that key.
   try {
-    const r = await callDebug(msg, mode);
-    if (!r.ai_available) { out.innerHTML = `<div class="panel err">Error: ${r.error}</div>`; return; }
-    out.innerHTML = `<div class="panel"><h3>${modeLabel(mode)}</h3><div class="answer">${r.answer}</div>${statsHTML(r)}</div>`;
-    appendHistory(msg, r.answer);
-    document.getElementById('msg').value = '';
-  } catch (e) {
-    out.innerHTML = `<div class="panel err">Request failed: ${e}</div>`;
-  }
-}
+    var s = localStorage.getItem("bertha_session_id");
+    if (s && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)) {
+      out.set("bbs", s);
+    }
+  } catch(e){}
 
-async function runAll() {
-  const msg = document.getElementById('msg').value.trim();
-  if (!msg) return;
-  const single = document.getElementById('single-result');
-  const out = document.getElementById('compare-result');
-  single.innerHTML = '';
-  out.innerHTML = `<div class="panel"><div class="loading">Running all 3 modes on the same conversation snapshot...</div></div>`;
-  const modes = ['fast', 'retrieval', 'full'];
-  try {
-    // Same history snapshot passed to all 3 -- a fair, apples-to-apples comparison,
-    // not letting mode A's answer leak into mode B/C's context for this one round.
-    const results = await Promise.all(modes.map(m => callDebug(msg, m, turns)));
-    out.innerHTML = `<div class="compare-grid">` + results.map((r, i) => {
-      if (!r.ai_available) return `<div class="panel err">${modeLabel(modes[i])}: ${r.error}</div>`;
-      return `<div class="panel"><h3>${modeLabel(modes[i])}</h3><div class="answer">${r.answer}</div>${statsHTML(r)}</div>`;
-    }).join('') + `</div>`;
-    // Advance the real conversation thread with the Full Bertha answer (mode C) --
-    // that's production behavior, the most representative "what actually happens next."
-    const full = results[2];
-    if (full.ai_available) appendHistory(msg, full.answer);
-    document.getElementById('msg').value = '';
-  } catch (e) {
-    out.innerHTML = `<div class="panel err">Request failed: ${e}</div>`;
-  }
-}
-
-// Restore visible history log from localStorage on load
-for (const [q, a] of turns) {
-  const el = document.getElementById('history');
-  const div = document.createElement('div');
-  div.className = 'turn';
-  div.innerHTML = `<div class="q">You: ${q}</div><div class="a">Bertha: ${a}</div>`;
-  el.appendChild(div);
-}
+  var url = DEST + (out.toString() ? (DEST.indexOf("?") > -1 ? "&" : "?") + out.toString() : "");
+  var a = document.getElementById("go");
+  if (a) a.href = url;
+  location.replace(url);
+})();
 </script>
-
 </body>
 </html>
